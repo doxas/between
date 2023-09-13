@@ -5,7 +5,7 @@ export class WebGLUtility {
    * @param {string} path - 読み込むファイルのパス
    * @return {Promise}
    */
-  static loadFile(path) {
+  static loadFile(path: string): Promise<string> {
     return new Promise((resolve, reject) => {
       // fetch を使ってファイルにアクセスする
       fetch(path)
@@ -29,7 +29,7 @@ export class WebGLUtility {
    * @param {string} path - 読み込むファイルのパス
    * @return {Promise}
    */
-  static loadImage(path) {
+  static loadImage(path: string): Promise<HTMLImageElement> {
     return new Promise((resolve) => {
       // Image オブジェクトの生成
       const img = new Image();
@@ -51,7 +51,7 @@ export class WebGLUtility {
    * @param {number} type - gl.VERTEX_SHADER or gl.FRAGMENT_SHADER
    * @return {WebGLShader} シェーダオブジェクト
    */
-  static createShader(gl, source, type) {
+  static createShader(gl: WebGLRenderingContext, source, type) {
     const shader = gl.createShader(type);
     gl.shaderSource(shader, source);
     gl.compileShader(shader);
@@ -71,7 +71,7 @@ export class WebGLUtility {
    * @param {WebGLShader} fs - フラグメントシェーダオブジェクト
    * @return {WebGLProgram} プログラムオブジェクト
    */
-  static createProgram(gl, vs, fs) {
+  static createProgram(gl: WebGLRenderingContext, vs: WebGLShader, fs: WebGLShader): WebGLProgram {
     const program = gl.createProgram();
     gl.attachShader(program, vs);
     gl.attachShader(program, fs);
@@ -91,7 +91,7 @@ export class WebGLUtility {
    * @param {Array} data - 頂点属性データを格納した配列
    * @return {WebGLBuffer} VBO
    */
-  static createVbo(gl, data) {
+  static createVbo(gl: WebGLRenderingContext, data: number[]): WebGLBuffer {
     const vbo = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data), gl.STATIC_DRAW);
@@ -105,7 +105,7 @@ export class WebGLUtility {
    * @param {Array} data - インデックスデータを格納した配列
    * @return {WebGLBuffer} IBO
    */
-  static createIbo(gl, data) {
+  static createIbo(gl: WebGLRenderingContext, data: number[]): WebGLBuffer {
     const ibo = gl.createBuffer();
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ibo);
     gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Int16Array(data), gl.STATIC_DRAW);
@@ -120,7 +120,7 @@ export class WebGLUtility {
    * @param {Array} data - インデックスデータを格納した配列
    * @return {WebGLBuffer} IBO
    */
-  createIboInt(gl, ext, data) {
+  createIboInt(gl: WebGLRenderingContext, ext: any, data: number[]): WebGLBuffer {
     if (ext == null || ext.elementIndexUint == null) {
       throw new Error('element index Uint not supported');
     }
@@ -134,23 +134,33 @@ export class WebGLUtility {
   /**
    * 画像ファイルを読み込み、テクスチャを生成してコールバックで返却する。
    * @param {WebGLRenderingContext} gl - WebGL コンテキスト
+   * @param {any} source - ソースとなるリソース
+   * @return {WebGLTexture}
+   */
+  static createTexture(gl: WebGLRenderingContext, source: any): WebGLTexture {
+    const tex = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D, tex);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, source);
+    gl.generateMipmap(gl.TEXTURE_2D);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    gl.bindTexture(gl.TEXTURE_2D, null);
+    return tex;
+  }
+
+  /**
+   * 画像ファイルを読み込み、テクスチャを生成してコールバックで返却する。
+   * @param {WebGLRenderingContext} gl - WebGL コンテキスト
    * @param {string} source - ソースとなる画像のパス
    * @return {Promise}
    */
-  static createTextureFromFile(gl, source) {
+  static createTextureFromFile(gl: WebGLRenderingContext, source: string): Promise<WebGLTexture> {
     return new Promise((resolve) => {
       const img = new Image();
       img.addEventListener('load', () => {
-        const tex = gl.createTexture();
-        gl.bindTexture(gl.TEXTURE_2D, tex);
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
-        gl.generateMipmap(gl.TEXTURE_2D);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-        gl.bindTexture(gl.TEXTURE_2D, null);
-        resolve(tex);
+        resolve(WebGLUtility.createTexture(gl, img));
       }, false);
       img.src = source;
     });
@@ -166,7 +176,7 @@ export class WebGLUtility {
    * @property {WebGLRenderbuffer} renderbuffer - 深度バッファとして設定したレンダーバッファ
    * @property {WebGLTexture} texture - カラーバッファとして設定したテクスチャ
    */
-  static createFramebuffer(gl, width, height) {
+  static createFramebuffer(gl: WebGLRenderingContext, width: number, height: number): any {
     const frameBuffer = gl.createFramebuffer();
     gl.bindFramebuffer(gl.FRAMEBUFFER, frameBuffer);
     const depthRenderBuffer = gl.createRenderbuffer();
@@ -197,7 +207,7 @@ export class WebGLUtility {
    * @property {WebGLFramebuffer} framebuffer - フレームバッファ
    * @property {WebGLTexture} texture - カラーバッファとして設定したテクスチャ
    */
-  static createFramebufferFloat(gl, ext, width, height) {
+  static createFramebufferFloat(gl: WebGLRenderingContext, ext: any, width: number, height: number): any {
     if (ext == null || (ext.textureFloat == null && ext.textureHalfFloat == null)) {
       throw new Error('float texture not supported');
     }
@@ -222,7 +232,7 @@ export class WebGLUtility {
    * @param {WebGLRenderingContext} gl - WebGL コンテキスト
    * @param {object} obj - createFramebuffer が返すオブジェクト
    */
-  static deleteFrameBuffer(gl, obj) {
+  static deleteFrameBuffer(gl: WebGLRenderingContext, obj: any): void {
     if (obj == null) {return;}
     if (obj.hasOwnProperty('framebuffer') === true && gl.isFramebuffer(obj.framebuffer) === true) {
       gl.bindFramebuffer(gl.FRAMEBUFFER, null);
@@ -250,7 +260,7 @@ export class WebGLUtility {
    * @property {object} textureFloat - フロートテクスチャを利用できるようにする
    * @property {object} textureHalfFloat - ハーフフロートテクスチャを利用できるようにする
    */
-  static getWebGLExtensions(gl) {
+  static getWebGLExtensions(gl: WebGLRenderingContext): any {
     return {
       elementIndexUint: gl.getExtension('OES_element_index_uint'),
       textureFloat:     gl.getExtension('OES_texture_float'),
@@ -260,6 +270,19 @@ export class WebGLUtility {
 }
 
 export class ShaderProgram {
+  gl: WebGLRenderingContext;
+  vertexShaderSource: string;
+  fragmentShaderSource: string;
+  attribute: string[];
+  stride: number[];
+  uniform: string[];
+  type: string[];
+  vertexShader: WebGLShader;
+  fragmentShader: WebGLShader;
+  program: WebGLProgram;
+  attributeLocation: number[];
+  uniformLocation: WebGLUniformLocation[];
+
   /**
    * @constructor
    * @param {WebGLRenderingContext} gl - WebGL コンテキスト
@@ -271,7 +294,7 @@ export class ShaderProgram {
    * @property {Array.<string>} uniform - uniform 変数名
    * @property {Array.<string>} type - uniform 変数のタイプ（例: uniform3fv など）
    */
-  constructor(gl, option) {
+  constructor(gl: WebGLRenderingContext, option: any) {
     this.gl = gl;
     this.vertexShaderSource = option.vertexShaderSource;
     this.fragmentShaderSource = option.fragmentShaderSource;
@@ -332,16 +355,16 @@ export class ShaderProgram {
   /**
    * プログラムオブジェクトを選択状態にする。
    */
-  use() {
+  use(): void {
     this.gl.useProgram(this.program);
   }
 
   /**
    * VBO を IBO をバインドし有効化する。
    * @param {Array.<WebGLBuffer>} vbo - VBO を格納した配列
-   * @param {WebGLBuffer} [ibo=null] - IBO
+   * @param {WebGLBuffer} ibo - IBO
    */
-  setAttribute(vbo, ibo = null) {
+  setAttribute(vbo: WebGLBuffer[], ibo: WebGLBuffer | undefined): void {
     const gl = this.gl;
     if (Array.isArray(vbo) !== true || vbo.length !== this.attribute.length) {
       throw new Error('vbo or attribute does not match');
@@ -360,7 +383,7 @@ export class ShaderProgram {
    * uniform 変数をまとめてシェーダに送る。
    * @param {Array} value - 各変数の値
    */
-  setUniform(value) {
+  setUniform(value: any[]): void {
     const gl = this.gl;
     if (this.uniform == null) {return;}
     if (Array.isArray(value) !== true || value.length !== this.uniform.length) {

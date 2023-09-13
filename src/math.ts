@@ -48,7 +48,7 @@ class Vec2 {
    * @param {Vec2} v - ２つの要素を持つベクトル
    * @return {number} ベクトルの長さ（大きさ）
    */
-  static length(v) {
+  static len(v) {
     return Math.sqrt(v[0] * v[0] + v[1] * v[1]);
   }
   /**
@@ -58,7 +58,7 @@ class Vec2 {
    */
   static normalize(v) {
     const n = Vec2.create();
-    const l = Vec2.length(v);
+    const l = Vec2.len(v);
     if (l > 0) {
       const i = 1 / l;
       n[0] = v[0] * i;
@@ -111,7 +111,7 @@ class Vec3 {
    * @param {Vec3} v - ３つの要素を持つベクトル
    * @return {number} ベクトルの長さ（大きさ）
    */
-  static length(v) {
+  static len(v) {
     return Math.sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]);
   }
   /**
@@ -121,7 +121,7 @@ class Vec3 {
    */
   static normalize(v) {
     const n = Vec3.create();
-    const l = Vec3.length(v);
+    const l = Vec3.len(v);
     if (l > 0) {
       const i = 1 / l;
       n[0] = v[0] * i;
