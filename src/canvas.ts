@@ -114,7 +114,6 @@ export class Renderer {
       uniform vec2 mouse;
       uniform float canvasAspect;
       uniform float resourceAspect;
-      varying vec4 vColor;
       varying vec2 vTexCoord;
       void main() {
         vTexCoord = texCoord;
@@ -129,20 +128,15 @@ export class Renderer {
         }
 
         gl_Position = vec4(p, 0.0, 1.0);
-        gl_Position = vec4(position, 0.0, 1.0);
-
-        vColor = vec4(position * 0.5 + 0.5, 0.0, 1.0);
       }
     `;
     this.fragmentShaderSource = `
       precision highp float;
       uniform sampler2D inputTexture;
       varying vec2 vTexCoord;
-      varying vec4 vColor;
       void main() {
         vec4 samplerColor = texture2D(inputTexture, vTexCoord);
-        gl_FragColor = samplerColor * vColor;
-        gl_FragColor = vColor;
+        gl_FragColor = samplerColor;
       }
     `;
 
@@ -213,7 +207,7 @@ export class Renderer {
       0,
     ]);
 
-    gl.drawElements(gl.TRIANGLES, this.indices.length, gl.UNSIGNED_BYTE, 0);
+    gl.drawElements(gl.TRIANGLES, this.indices.length, gl.UNSIGNED_SHORT, 0);
   }
   eventSetting(): void {
     window.addEventListener('resize', this.resize, false);
