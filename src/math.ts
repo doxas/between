@@ -8,22 +8,22 @@ export class WebGLMath {
    * @static
    * @type {Vec2}
    */
-  static get Vec2() {return Vec2;}
+  static get Vec2(): Vec2 {return Vec2;}
   /**
    * @static
    * @type {Vec3}
    */
-  static get Vec3() {return Vec3;}
+  static get Vec3(): Vec3 {return Vec3;}
   /**
    * @static
    * @type {Mat4}
    */
-  static get Mat4() {return Mat4;}
+  static get Mat4(): Mat4 {return Mat4;}
   /**
    * @static
    * @type {Qtn}
    */
-  static get Qtn() {return Qtn;}
+  static get Qtn(): Qtn {return Qtn;}
 }
 
 /**
@@ -37,7 +37,7 @@ class Vec2 {
    * @param {number} [y=0] - Y 要素の値
    * @return {Float32Array} ベクトル格納用の配列
    */
-  static create(x = 0, y = 0) {
+  static create(x: number = 0, y: number = 0): Float32Array {
     const out = new Float32Array(2);
     out[0] = x;
     out[1] = y;
@@ -48,7 +48,7 @@ class Vec2 {
    * @param {Vec2} v - ２つの要素を持つベクトル
    * @return {number} ベクトルの長さ（大きさ）
    */
-  static len(v) {
+  static len(v: Float32Array): number {
     return Math.sqrt(v[0] * v[0] + v[1] * v[1]);
   }
   /**
@@ -56,7 +56,7 @@ class Vec2 {
    * @param {Vec2} v - ２つの要素を持つベクトル
    * @return {Vec2} 正規化したベクトル
    */
-  static normalize(v) {
+  static normalize(v: Float32Array): Float32Array {
     const n = Vec2.create();
     const l = Vec2.len(v);
     if (l > 0) {
@@ -72,7 +72,7 @@ class Vec2 {
    * @param {Vec2} v1 - ２つの要素を持つベクトル
    * @return {number} 内積の結果
    */
-  static dot(v0, v1) {
+  static dot(v0: Float32Array, v1: Float32Array): number {
     return v0[0] * v1[0] + v0[1] * v1[1];
   }
   /**
@@ -81,7 +81,7 @@ class Vec2 {
    * @param {Vec2} v1 - ２つの要素を持つベクトル
    * @return {number} 外積の結果
    */
-  static cross(v0, v1) {
+  static cross(v0: Float32Array, v1: Float32Array): number {
     const n = Vec2.create();
     return v0[0] * v1[1] - v0[1] * v1[0];
   }
@@ -99,7 +99,7 @@ class Vec3 {
    * @param {number} [z=0] - Z 要素の値
    * @return {Float32Array} ベクトル格納用の配列
    */
-  static create(x = 0, y = 0, z = 0) {
+  static create(x: number = 0, y: number = 0, z: number = 0): Float32Array {
     const out = new Float32Array(3);
     out[0] = x;
     out[1] = y;
@@ -111,7 +111,7 @@ class Vec3 {
    * @param {Vec3} v - ３つの要素を持つベクトル
    * @return {number} ベクトルの長さ（大きさ）
    */
-  static len(v) {
+  static len(v: Float32Array): number {
     return Math.sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]);
   }
   /**
@@ -119,7 +119,7 @@ class Vec3 {
    * @param {Vec3} v - ３つの要素を持つベクトル
    * @return {Vec3} 正規化したベクトル
    */
-  static normalize(v) {
+  static normalize(v: Float32Array): Float32Array {
     const n = Vec3.create();
     const l = Vec3.len(v);
     if (l > 0) {
@@ -136,7 +136,7 @@ class Vec3 {
    * @param {Vec3} v1 - ３つの要素を持つベクトル
    * @return {number} 内積の結果
    */
-  static dot(v0, v1) {
+  static dot(v0: Float32Array, v1: Float32Array): number {
     return v0[0] * v1[0] + v0[1] * v1[1] + v0[2] * v1[2];
   }
   /**
@@ -145,7 +145,7 @@ class Vec3 {
    * @param {Vec3} v1 - ３つの要素を持つベクトル
    * @return {Vec3} 外積の結果
    */
-  static cross(v0, v1) {
+  static cross(v0: Float32Array, v1: Float32Array): Float32Array {
     return Vec3.create(
       v0[1] * v1[2] - v0[2] * v1[1],
       v0[2] * v1[0] - v0[0] * v1[2],
@@ -159,7 +159,7 @@ class Vec3 {
    * @param {Vec3} v2 - ３つの要素を持つベクトル
    * @return {Vec3} 面法線ベクトル
    */
-  static faceNormal(v0, v1, v2) {
+  static faceNormal(v0: Float32Array, v1: Float32Array, v2: Float32Array): Float32Array {
     const vec0 = Vec3.create(v1[0] - v0[0], v1[1] - v0[1], v1[2] - v0[2]);
     const vec1 = Vec3.create(v2[0] - v0[0], v2[1] - v0[1], v2[2] - v0[2]);
     const n = Vec3.create(
@@ -180,7 +180,7 @@ class Mat4 {
    * 4x4 の正方行列を生成する
    * @return {Float32Array} 行列格納用の配列
    */
-  static create() {
+  static create(): Float32Array {
     return new Float32Array(16);
   }
   /**
@@ -188,7 +188,7 @@ class Mat4 {
    * @param {Mat4} dest - 単位化する行列
    * @return {Mat4} 単位化した行列
    */
-  static identity(dest) {
+  static identity(dest: Float32Array): Float32Array {
     const out = dest == null ? Mat4.create() : dest;
     out[0]  = 1; out[1]  = 0; out[2]  = 0; out[3]  = 0;
     out[4]  = 0; out[5]  = 1; out[6]  = 0; out[7]  = 0;
@@ -203,7 +203,7 @@ class Mat4 {
    * @param {Mat4} [dest] - 乗算結果を格納する行列
    * @return {Mat4} 乗算結果の行列
    */
-  static multiply(mat0, mat1, dest) {
+  static multiply(mat0: Float32Array, mat1: Float32Array, dest: Float32Array): Float32Array {
     const out = dest == null ? Mat4.create() : dest;
     const a = mat0[0],  b = mat0[1],  c = mat0[2],  d = mat0[3],
           e = mat0[4],  f = mat0[5],  g = mat0[6],  h = mat0[7],
@@ -238,7 +238,7 @@ class Mat4 {
    * @param {Mat4} [dest] - 結果を格納する行列
    * @return {Mat4} 結果の行列
    */
-  static scale(mat, vec, dest) {
+  static scale(mat: Float32Array, vec: Float32Array, dest: Float32Array): Float32Array {
     const out = dest == null ? Mat4.create() : dest;
     out[0]  = mat[0]  * vec[0];
     out[1]  = mat[1]  * vec[0];
@@ -265,7 +265,7 @@ class Mat4 {
    * @param {Mat4} [dest] - 結果を格納する行列
    * @return {Mat4} 結果の行列
    */
-  static translate(mat, vec, dest) {
+  static translate(mat: Float32Array, vec: Float32Array, dest: Float32Array): Float32Array {
     const out = dest == null ? Mat4.create() : dest;
     out[0] = mat[0]; out[1] = mat[1]; out[2]  = mat[2];  out[3]  = mat[3];
     out[4] = mat[4]; out[5] = mat[5]; out[6]  = mat[6];  out[7]  = mat[7];
@@ -284,7 +284,7 @@ class Mat4 {
    * @param {Mat4} [dest] - 結果を格納する行列
    * @return {Mat4} 結果の行列
    */
-  static rotate(mat, angle, axis, dest) {
+  static rotate(mat: Float32Array, angle: number, axis: Float32Array, dest: Float32Array): Float32Array {
     let out = dest == null ? Mat4.create() : dest;
     const sq = Math.sqrt(axis[0] * axis[0] + axis[1] * axis[1] + axis[2] * axis[2]);
     if (!sq) {
@@ -342,7 +342,7 @@ class Mat4 {
    * @param {Mat4} [dest] - 結果を格納する行列
    * @return {Mat4} 結果の行列
    */
-  static lookAt(eye, center, up, dest) {
+  static lookAt(eye: Float32Array, center: Float32Array, up: Float32Array, dest: Float32Array): Float32Array {
     const out = dest == null ? Mat4.create() : dest;
     const eyeX    = eye[0],    eyeY    = eye[1],    eyeZ    = eye[2],
           centerX = center[0], centerY = center[1], centerZ = center[2],
@@ -394,7 +394,7 @@ class Mat4 {
    * @param {Mat4} [dest] - 結果を格納する行列
    * @return {Mat4} 結果の行列
    */
-  static perspective(fovy, aspect, near, far, dest) {
+  static perspective(fovy: number, aspect: number, near: number, far: number, dest: Float32Array): Float32Array {
     const out = dest == null ? Mat4.create() : dest;
     const t = near * Math.tan(fovy * Math.PI / 360);
     const r = t * aspect;
@@ -428,7 +428,7 @@ class Mat4 {
    * @param {Mat4} [dest] - 結果を格納する行列
    * @return {Mat4} 結果の行列
    */
-  static ortho(left, right, top, bottom, near, far, dest) {
+  static ortho(left: number, right: number, top: number, bottom: number, near: number, far: number, dest: Float32Array): Float32Array {
     const out = dest == null ? Mat4.create() : dest;
     const h = right - left;
     const v = top - bottom;
@@ -457,7 +457,7 @@ class Mat4 {
    * @param {Mat4} [dest] - 結果を格納する行列
    * @return {Mat4} 結果の行列
    */
-  static transpose(mat, dest) {
+  static transpose(mat: Float32Array, dest: Float32Array): Float32Array {
     const out = dest == null ? Mat4.create() : dest;
     out[0]  = mat[0];  out[1]  = mat[4];
     out[2]  = mat[8];  out[3]  = mat[12];
@@ -475,7 +475,7 @@ class Mat4 {
    * @param {Mat4} [dest] - 結果を格納する行列
    * @return {Mat4} 結果の行列
    */
-  static inverse(mat, dest) {
+  static inverse(mat: Float32Array, dest: Float32Array): Float32Array {
     const out = dest == null ? Mat4.create() : dest;
     const a = mat[0],  b = mat[1],  c = mat[2],  d = mat[3],
           e = mat[4],  f = mat[5],  g = mat[6],  h = mat[7],
@@ -512,7 +512,7 @@ class Mat4 {
    * @param {Array.<number>} vec - 乗算するベクトル（4 つの要素を持つ配列）
    * @return {Float32Array} 結果のベクトル
    */
-  static toVecIV(mat, vec) {
+  static toVecIV(mat: Float32Array, vec: Float32Array): Float32Array {
     const a = mat[0],  b = mat[1],  c = mat[2],  d = mat[3],
           e = mat[4],  f = mat[5],  g = mat[6],  h = mat[7],
           i = mat[8],  j = mat[9],  k = mat[10], l = mat[11],
@@ -533,10 +533,15 @@ class Mat4 {
    * @param {number} height - ビューポートの高さ
    * @return {Vec2} 結果のベクトル
    */
-  static screenPositionFromMvp(mat, vec, width, height) {
+  static screenPositionFromMvp(mat: Float32Array, vec: Float32Array, width: number, height: number): number[] | Float32Array {
     const halfWidth = width * 0.5;
     const halfHeight = height * 0.5;
-    const v = Mat4.toVecIV(mat, [vec[0], vec[1], vec[2], 1.0]);
+    const t = new Float32Array(4);
+    t[0] = vec[0];
+    t[1] = vec[1];
+    t[2] = vec[2];
+    t[3] = 1.0;
+    const v = Mat4.toVecIV(mat, t);
     if (v[3] <= 0.0) {
       return [NaN, NaN];
     }
@@ -559,7 +564,7 @@ class Qtn {
    * 4 つの要素からなるクォータニオンのデータ構造を生成する（虚部 x, y, z, 実部 w の順序で定義）
    * @return {Float32Array} クォータニオンデータ格納用の配列
    */
-  static create() {
+  static create(): Float32Array {
     return new Float32Array(4);
   }
   /**
@@ -567,7 +572,7 @@ class Qtn {
    * @param {Qtn} dest - 初期化するクォータニオン
    * @return {Qtn} 結果のクォータニオン
    */
-  static identity(dest) {
+  static identity(dest: Float32Array): Float32Array {
     const out = dest == null ? Qtn.create() : dest;
     out[0] = 0;
     out[1] = 0;
@@ -581,7 +586,7 @@ class Qtn {
    * @param {Qtn} [dest] - 結果を格納するクォータニオン
    * @return {Qtn} 結果のクォータニオン
    */
-  static inverse(qtn, dest) {
+  static inverse(qtn: Float32Array, dest: Float32Array): Float32Array {
     const out = dest == null ? Qtn.create() : dest;
     out[0] = -qtn[0];
     out[1] = -qtn[1];
@@ -594,7 +599,7 @@ class Qtn {
    * @param {Qtn} qtn - 元となるクォータニオン
    * @return {Qtn} 結果のクォータニオン
    */
-  static normalize(qtn) {
+  static normalize(qtn: Float32Array): Float32Array {
     const out = Qtn.create();
     const x = qtn[0], y = qtn[1], z = qtn[2];
     const l = Math.sqrt(x * x + y * y + z * z);
@@ -613,7 +618,7 @@ class Qtn {
    * @param {Qtn} [dest] - 結果を格納するクォータニオン
    * @return {Qtn} 結果のクォータニオン
    */
-  static multiply(qtn0, qtn1, dest) {
+  static multiply(qtn0: Float32Array, qtn1: Float32Array, dest: Float32Array): Float32Array {
     const out = dest == null ? Qtn.create() : dest;
     const ax = qtn0[0], ay = qtn0[1], az = qtn0[2], aw = qtn0[3];
     const bx = qtn1[0], by = qtn1[1], bz = qtn1[2], bw = qtn1[3];
@@ -630,7 +635,7 @@ class Qtn {
    * @param {Qtn} [dest] - 結果を格納するクォータニオン
    * @return {Qtn} 結果のクォータニオン
    */
-  static rotate(angle, axis, dest) {
+  static rotate(angle: number, axis: Float32Array, dest: Float32Array): Float32Array {
     const out = dest == null ? Qtn.create() : dest;
     let a = axis[0], b = axis[1], c = axis[2];
     const sq = Math.sqrt(axis[0] * axis[0] + axis[1] * axis[1] + axis[2] * axis[2]);
@@ -654,7 +659,7 @@ class Qtn {
    * @param {Vec3} [dest] - ３つの要素を持つベクトル
    * @return {Vec3} 結果のベクトル
    */
-  static toVecIII(vec, qtn, dest) {
+  static toVecIII(vec: Float32Array, qtn: Float32Array, dest: Float32Array): Float32Array {
     const out = dest == null ? Vec3.create() : dest;
     const qp = Qtn.create();
     const qq = Qtn.create();
@@ -676,7 +681,7 @@ class Qtn {
    * @param {Mat4} [dest] - 4x4 行列
    * @return {Mat4} 結果の行列
    */
-  static toMatIV(qtn, dest) {
+  static toMatIV(qtn: Float32Array, dest: Float32Array): Float32Array {
     const out = dest == null ? Mat4.create() : dest;
     const x = qtn[0], y = qtn[1], z = qtn[2], w = qtn[3];
     const x2 = x + x, y2 = y + y, z2 = z + z;
@@ -709,7 +714,7 @@ class Qtn {
    * @param {Qtn} [dest] - 結果を格納するクォータニオン
    * @return {Qtn} 結果のクォータニオン
    */
-  static slerp(qtn0, qtn1, time, dest) {
+  static slerp(qtn0: Float32Array, qtn1: Float32Array, time: number, dest: Float32Array): Float32Array {
     const out = dest == null ? Qtn.create() : dest;
     const ht = qtn0[0] * qtn1[0] + qtn0[1] * qtn1[1] + qtn0[2] * qtn1[2] + qtn0[3] * qtn1[3];
     let hs = 1.0 - ht * ht;
@@ -739,4 +744,3 @@ class Qtn {
     return out;
   }
 }
-
