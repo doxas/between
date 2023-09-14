@@ -120,7 +120,11 @@ export class Renderer {
 
         vec2 o = offset * crevice;
         vec2 p = position + o;
-        p = vec2(p.x, p.y / resourceAspect);
+        if (resourceAspect > 1.0) {
+          p.y /= resourceAspect;
+        } else {
+          p.x *= resourceAspect;
+        }
         if (canvasAspect > 1.0) {
           p.x /= canvasAspect;
         } else {
