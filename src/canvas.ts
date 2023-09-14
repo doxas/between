@@ -162,12 +162,14 @@ export class Renderer {
         vec2 edge = (1.0 - abs(position));
         float creviceRatio = 1.0 - max(crevice.x, crevice.y);
 
+        vec2 m = mouse * 5.0; // interaction intensity
+
         vec2 t = texCoord * 2.0 - 1.0;
-        t = t + vec2(mouse.x, -mouse.y) * edge * crevice / creviceRatio;
+        t = t + vec2(m.x, -m.y) * edge * crevice / creviceRatio;
         vTexCoord = t * 0.5 + 0.5;
 
         vec2 o = offset * crevice;
-        vec2 p = position * creviceRatio + o + mouse * edge * crevice;
+        vec2 p = position * creviceRatio + o + m * edge * crevice;
         if (resourceAspect > 1.0) {
           p.y /= resourceAspect;
         } else {
