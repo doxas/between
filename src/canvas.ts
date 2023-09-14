@@ -1,11 +1,12 @@
-import { initializeBuffer } from "@tweakpane/core";
+import { BladeApi } from '@tweakpane/core';
+import { Pane } from 'tweakpane';
 import { ShaderProgram, WebGLUtility } from './webgl';
 
 export class Renderer {
   private parent: HTMLElement;
   private canvas: HTMLCanvasElement;
   private context: CanvasRenderingContext2D;
-  private image: HTMLImageElement;
+  private image: HTMLImageElement | HTMLCanvasElement;
   private glCanvas: HTMLCanvasElement;
   private gl: WebGLRenderingContext;
   private isRendering: boolean;
@@ -30,7 +31,7 @@ export class Renderer {
     this.canvas = document.createElement('canvas');
     this.context = this.canvas.getContext('2d');
     this.glCanvas = document.createElement('canvas');
-    this.gl = this.glCanvas.getContext('webgl');
+    this.gl = this.glCanvas.getContext('webgl', {preserveDrawingBuffer: true});
 
     this.canvas.style.width = '100%';
     this.canvas.style.height = '100%';
@@ -51,8 +52,49 @@ export class Renderer {
     this.resize();
     this.init();
     this.eventSetting();
+    this.paneSetting();
   }
+  paneSetting(): void {
+    const pane = new Pane();
 
+    pane.addInput({'crevice-x': this.uCrevice[0]}, 'crevice-x', {
+      min: 0,
+      max: 1.0,
+    }).on('change', (v) => { this.uCrevice[0] = v.value; });
+    pane.addInput({'crevice-y': this.uCrevice[1]}, 'crevice-y', {
+      min: 0,
+      max: 1.0,
+    }).on('change', (v) => { this.uCrevice[1] = v.value; });
+
+    // const btn = pane.addButton({
+    //   title: 're-render',
+    // });
+    // btn.on('click', () => {
+    //   renderer.render();
+    // });
+    // const list = pane.addBlade({
+    //   view: 'list',
+    //   label: 'mode',
+    //   options: [
+    //     {text: 'default', value: 0},
+    //     {text: 'with-line', value: 1},
+    //   ],
+    //   value: 0,
+    // }) as unknown as any;
+    // list.on('change', (v) => {
+    //   renderer.mode = v.value;
+    // });
+    // pane.addInput({monochrome: renderer.monochrome}, 'monochrome').on('change', (v) => {
+    //   renderer.monochrome = v.value === true;
+    // });
+    // pane.addInput({sizeRatio: renderer.sizeRatio}, 'sizeRatio', {
+    //   step: 1,
+    //   min: 1,
+    //   max: 10000.0,
+    // }).on('change', (v) => {
+    //   renderer.sizeRatio = v.value;
+    // });
+  }
   init(): void {
     this.isRendering = false;
     if (this.gl == null) {
@@ -66,6 +108,7 @@ export class Renderer {
     const ROW = 2;
     const COLUMN = 2;
     const COUNT_X = (COLUMN - 1) * 2 + 2;
+    const COUNT_Y = (ROW - 1) * 2 + 2;
     const SIZE = 2;
     const start = -SIZE / 2;
     const wx = SIZE / COLUMN;
@@ -82,8 +125,8 @@ export class Renderer {
           const u = j / COLUMN;
           const dc = (j === 0 || j === COLUMN) ? 1 : 2;
           for (let J = 0; J < dc; ++J) {
-            const cy = i === 0 ? 1.0 : -1.0;
-            const cx = j === 0 ? -1.0 : 1.0;
+            const cy = iI < COUNT_Y / 2 ? 1.0 : -1.0;
+            const cx = iJ < COUNT_X / 2 ? -1.0 : 1.0;
             this.position.push(x, -y);
             this.texCoord.push(u, v);
             this.offset.push(cx, cy);
@@ -116,10 +159,15 @@ export class Renderer {
       uniform float resourceAspect;
       varying vec2 vTexCoord;
       void main() {
-        vTexCoord = texCoord;
+        vec2 edge = (1.0 - abs(position));
+        float creviceRatio = 1.0 - max(crevice.x, crevice.y);
+
+        vec2 t = texCoord * 2.0 - 1.0;
+        t = t + vec2(mouse.x, -mouse.y) * edge * crevice / creviceRatio;
+        vTexCoord = t * 0.5 + 0.5;
 
         vec2 o = offset * crevice;
-        vec2 p = position + o;
+        vec2 p = position * creviceRatio + o + mouse * edge * crevice;
         if (resourceAspect > 1.0) {
           p.y /= resourceAspect;
         } else {
@@ -230,7 +278,38 @@ export class Renderer {
         const url = reader.result as string;
         this.image = new Image();
         this.image.addEventListener('load', () => {
-          this.uResourceAspect = this.image.naturalWidth / this.image.naturalHeight;
+          const img = this.image as HTMLImageElement;
+          this.uResourceAspect = img.naturalWidth / img.naturalHeight;
+          if (Renderer.isPower(img.naturalWidth) !== true || Renderer.isPower(img.naturalHeight) !== true) {
+            const c = document.createElement('canvas');
+            const cx = c.getContext('2d');
+            const nw = img.naturalWidth;
+            const nh = img.naturalHeight;
+            let width = 0;
+            let height = 0;
+            let counter = 0;
+            while(true) {
+              ++counter;
+              const v = Math.pow(2, counter);
+              if (width === 0) {
+                if (nw < v) {
+                  width = v;
+                }
+              }
+              if (height === 0) {
+                if (nh < v) {
+                  height = v;
+                }
+              }
+              if (width !== 0 && height !== 0) {
+                break;
+              }
+            }
+            c.width = width;
+            c.height = height;
+            cx.drawImage(this.image, 0, 0, width, height);
+            this.image = c;
+          }
           this.update();
         }, false);
         this.image.src = url;
@@ -245,11 +324,18 @@ export class Renderer {
       this.uMouse[1] = -y;
     }, false);
   }
-  resize() {
+  resize(): void {
     this.canvas.width = window.innerWidth;
     this.canvas.height = window.innerHeight;
     this.glCanvas.width = window.innerWidth;
     this.glCanvas.height = window.innerHeight;
     this.uCanvasAspect = window.innerWidth / window.innerHeight;
+  }
+  static isPower(v: number): boolean {
+    if (v === 0) {
+      return false;
+    } else {
+      return (v & (v - 1)) === 0;
+    }
   }
 }
