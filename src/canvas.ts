@@ -411,7 +411,7 @@ export class Renderer {
       const url = this.glCanvas.toDataURL();
       const anchor = document.createElement('a');
       document.body.appendChild(anchor);
-      anchor.download = `_${this.imageName}.png`;
+      anchor.download = `${this.imageName}.png`;
       anchor.href = url;
       anchor.click();
       document.body.removeChild(anchor);
