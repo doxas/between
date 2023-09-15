@@ -19,6 +19,8 @@ export class Renderer {
   private vertexShaderSource: string;
   private fragmentShaderSource: string;
   private shaderProgram: ShaderProgram;
+  private exVertexShaderSource: string;
+  private exShaderProgram: ShaderProgram;
   private position: number[];
   private texCoord: number[];
   private offset: number[];
@@ -201,8 +203,33 @@ export class Renderer {
         gl_FragColor = samplerColor;
       }
     `;
+    this.exVertexShaderSource = `
+      attribute vec2 position;
+      attribute vec2 texCoord;
+      attribute vec2 offset;
+      uniform vec2 crevice;
+      uniform vec2 mouse;
+      uniform float canvasAspect;
+      uniform float resourceAspect;
+      varying vec2 vTexCoord;
+      void main() {
+        vec2 edge = (1.0 - abs(position));
+        float creviceRatio = 1.0 - max(crevice.x, crevice.y);
 
-    this.shaderProgram = new ShaderProgram(gl, {
+        vec2 m = mouse * 5.0; // interaction intensity
+
+        vec2 t = texCoord * 2.0 - 1.0;
+        t = t + vec2(m.x, -m.y) * edge * crevice / creviceRatio;
+        vTexCoord = t * 0.5 + 0.5;
+
+        vec2 o = offset * crevice * edge;
+        vec2 p = position + o + m * edge * crevice;
+
+        gl_Position = vec4(p, 0.0, 1.0);
+      }
+    `;
+
+    const option = {
       vertexShaderSource: this.vertexShaderSource,
       fragmentShaderSource: this.fragmentShaderSource,
       attribute: [
@@ -229,9 +256,10 @@ export class Renderer {
         'uniform1f',
         'uniform1i',
       ],
-    });
-    this.shaderProgram.use();
-    this.shaderProgram.setAttribute(this.vbo, this.ibo);
+    };
+    this.shaderProgram = new ShaderProgram(gl, option);
+    option.vertexShaderSource = this.exVertexShaderSource;
+    this.exShaderProgram = new ShaderProgram(gl, option);
 
     gl.clearColor(0.5, 0.5, 0.5, 1.0);
 
@@ -260,25 +288,32 @@ export class Renderer {
 
     requestAnimationFrame(this.render);
 
-    if (this.exportFunction != null) {
-      const width = this.imageWidth * (1.0 + this.uCrevice[0]);
-      const height = this.imageHeight * (1.0 + this.uCrevice[1]);
-      this.glCanvas.width = width;
-      this.glCanvas.height = height;
-      this.uCanvasAspect = width / height;
-    }
-
-    gl.viewport(0, 0, this.glCanvas.width, this.glCanvas.height);
-    gl.clear(gl.COLOR_BUFFER_BIT);
-
-    this.shaderProgram.setUniform([
+    const uniforms = [
       this.uCrevice,
       this.uMouse,
       this.uCanvasAspect,
       this.uResourceAspect,
       0,
-    ]);
+    ];
 
+    if (this.exportFunction != null) {
+      const width = this.imageWidth + this.imageWidth * this.uCrevice[0] * 2.0;
+      const height = this.imageHeight + this.imageHeight * this.uCrevice[1] * 2.0;
+      this.glCanvas.width = width;
+      this.glCanvas.height = height;
+      this.uCanvasAspect = width / height;
+
+      this.exShaderProgram.use();
+      this.exShaderProgram.setAttribute(this.vbo, this.ibo);
+      this.exShaderProgram.setUniform(uniforms);
+    } else {
+      this.shaderProgram.use();
+      this.shaderProgram.setAttribute(this.vbo, this.ibo);
+      this.shaderProgram.setUniform(uniforms);
+    }
+
+    gl.viewport(0, 0, this.glCanvas.width, this.glCanvas.height);
+    gl.clear(gl.COLOR_BUFFER_BIT);
     gl.drawElements(gl.TRIANGLES, this.indices.length, gl.UNSIGNED_SHORT, 0);
 
     if (this.exportFunction != null) {
