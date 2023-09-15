@@ -2,11 +2,16 @@ import { BladeApi } from '@tweakpane/core';
 import { Pane } from 'tweakpane';
 import { ShaderProgram, WebGLUtility } from './webgl';
 
+// TODO: 画像を保存するところを作る
+
 export class Renderer {
   private parent: HTMLElement;
   private canvas: HTMLCanvasElement;
   private context: CanvasRenderingContext2D;
   private image: HTMLImageElement | HTMLCanvasElement;
+  private imageName: string;
+  private imageWidth: number;
+  private imageHeight: number;
   private glCanvas: HTMLCanvasElement;
   private gl: WebGLRenderingContext;
   private isRendering: boolean;
@@ -20,6 +25,8 @@ export class Renderer {
   private indices: number[];
   private vbo: WebGLBuffer[];
   private ibo: WebGLBuffer;
+
+  private exportFunction: () => void | null;
 
   private uCrevice: number[];
   private uMouse: number[];
@@ -46,6 +53,7 @@ export class Renderer {
     this.parent.appendChild(this.glCanvas);
     this.parent.appendChild(this.canvas);
 
+    this.exportFunction = null;
     this.render = this.render.bind(this);
     this.resize = this.resize.bind(this);
 
@@ -249,7 +257,17 @@ export class Renderer {
   }
   render(): void {
     const gl = this.gl;
+
     requestAnimationFrame(this.render);
+
+    if (this.exportFunction != null) {
+      const width = this.imageWidth * (1.0 + this.uCrevice[0]);
+      const height = this.imageHeight * (1.0 + this.uCrevice[1]);
+      this.glCanvas.width = width;
+      this.glCanvas.height = height;
+      this.uCanvasAspect = width / height;
+    }
+
     gl.viewport(0, 0, this.glCanvas.width, this.glCanvas.height);
     gl.clear(gl.COLOR_BUFFER_BIT);
 
@@ -262,9 +280,26 @@ export class Renderer {
     ]);
 
     gl.drawElements(gl.TRIANGLES, this.indices.length, gl.UNSIGNED_SHORT, 0);
+
+    if (this.exportFunction != null) {
+      this.exportFunction();
+      this.exportFunction = null;
+      this.glCanvas.width = window.innerWidth;
+      this.glCanvas.height = window.innerHeight;
+      this.uCanvasAspect = window.innerWidth / window.innerHeight;
+    }
   }
   eventSetting(): void {
     window.addEventListener('resize', this.resize, false);
+    window.addEventListener('keydown', (keyboardEvent) => {
+      switch(keyboardEvent.key) {
+        case 'e':
+          this.export();
+          break;
+        default:
+          break;
+      }
+    }, false);
     const body = document.body;
     body.addEventListener('dragover', (evt) => {
       evt.preventDefault();
@@ -281,6 +316,8 @@ export class Renderer {
         this.image = new Image();
         this.image.addEventListener('load', () => {
           const img = this.image as HTMLImageElement;
+          this.imageWidth = img.naturalWidth;
+          this.imageHeight = img.naturalHeight;
           this.uResourceAspect = img.naturalWidth / img.naturalHeight;
           if (Renderer.isPower(img.naturalWidth) !== true || Renderer.isPower(img.naturalHeight) !== true) {
             const c = document.createElement('canvas');
@@ -316,6 +353,7 @@ export class Renderer {
         }, false);
         this.image.src = url;
       }, false);
+      this.imageName = files[0].name;
       reader.readAsDataURL(files[0]);
     }, false);
 
@@ -332,6 +370,17 @@ export class Renderer {
     this.glCanvas.width = window.innerWidth;
     this.glCanvas.height = window.innerHeight;
     this.uCanvasAspect = window.innerWidth / window.innerHeight;
+  }
+  export(): void {
+    this.exportFunction = () => {
+      const url = this.glCanvas.toDataURL();
+      const anchor = document.createElement('a');
+      document.body.appendChild(anchor);
+      anchor.download = `_${this.imageName}.png`;
+      anchor.href = url;
+      anchor.click();
+      document.body.removeChild(anchor);
+    };
   }
   static isPower(v: number): boolean {
     if (v === 0) {
