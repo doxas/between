@@ -387,6 +387,8 @@ export class Renderer {
     this.uCanvasAspect = window.innerWidth / window.innerHeight;
   }
   export(): void {
+    if (this.isRendering !== true) {return;}
+
     this.exportFunction = () => {
       const url = this.glCanvas.toDataURL();
       const anchor = document.createElement('a');
