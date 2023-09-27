@@ -4,5 +4,4 @@ import './main.scss';
 
 window.addEventListener('DOMContentLoaded', () => {
   const renderer = new Renderer(document.body);
-  console.log('😇', renderer);
 }, false);
