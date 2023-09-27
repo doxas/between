@@ -1,4 +1,3 @@
-import { BladeApi } from '@tweakpane/core';
 import { Pane } from 'tweakpane';
 import { ShaderProgram, WebGLUtility } from './webgl';
 
@@ -73,35 +72,35 @@ export class Renderer {
   paneSetting(): void {
     const pane = new Pane();
 
-    const creviceX = pane.addInput({'crevice-x': this.uCrevice[0]}, 'crevice-x', {
+    const creviceX = pane.addBinding({'crevice-x': this.uCrevice[0]}, 'crevice-x', {
       min: 0,
       max: 1.0,
     }).on('change', (v) => { this.uCrevice[0] = v.value; });
-    const creviceY = pane.addInput({'crevice-y': this.uCrevice[1]}, 'crevice-y', {
+    const creviceY = pane.addBinding({'crevice-y': this.uCrevice[1]}, 'crevice-y', {
       min: 0,
       max: 1.0,
     }).on('change', (v) => { this.uCrevice[1] = v.value; });
-    const temperature = pane.addInput({'temperature': this.uTemperature}, 'temperature', {
+    const temperature = pane.addBinding({'temperature': this.uTemperature}, 'temperature', {
       min: -1.67,
       max: 1.67,
     }).on('change', (v) => { this.uTemperature = v.value; });
-    const tint = pane.addInput({'tint': this.uTint}, 'tint', {
+    const tint = pane.addBinding({'tint': this.uTint}, 'tint', {
       min: -1.67,
       max: 1.67,
     }).on('change', (v) => { this.uTint = v.value; });
-    const contrast = pane.addInput({'contrast': this.uContrast}, 'contrast', {
+    const contrast = pane.addBinding({'contrast': this.uContrast}, 'contrast', {
       min: 0.0,
       max: 1.0,
     }).on('change', (v) => { this.uContrast = v.value; });
-    const HSVH = pane.addInput({'hsv-H': this.uHSV[0]}, 'hsv-H', {
+    const HSVH = pane.addBinding({'hsv-H': this.uHSV[0]}, 'hsv-H', {
       min: 0.0,
       max: 1.0,
     }).on('change', (v) => { this.uHSV[0] = v.value; });
-    const HSVS = pane.addInput({'hsv-S': this.uHSV[1]}, 'hsv-S', {
+    const HSVS = pane.addBinding({'hsv-S': this.uHSV[1]}, 'hsv-S', {
       min: -1.0,
       max: 1.0,
     }).on('change', (v) => { this.uHSV[1] = v.value; });
-    const HSVV = pane.addInput({'hsv-V': this.uHSV[2]}, 'hsv-V', {
+    const HSVV = pane.addBinding({'hsv-V': this.uHSV[2]}, 'hsv-V', {
       min: -1.0,
       max: 1.0,
     }).on('change', (v) => { this.uHSV[2] = v.value; });
@@ -119,14 +118,21 @@ export class Renderer {
       this.uHSV[1] = 0.0;
       this.uHSV[2] = 0.0;
       // reset inputs
-      creviceX.controller_.binding.value.setRawValue(0);
-      creviceY.controller_.binding.value.setRawValue(0);
-      temperature.controller_.binding.value.setRawValue(0);
-      tint.controller_.binding.value.setRawValue(0);
-      contrast.controller_.binding.value.setRawValue(0.5);
-      HSVH.controller_.binding.value.setRawValue(0);
-      HSVS.controller_.binding.value.setRawValue(0);
-      HSVV.controller_.binding.value.setRawValue(0);
+      creviceX.controller.value.setRawValue(0);
+      creviceX.controller.value.setRawValue(0);
+      creviceY.controller.value.setRawValue(0);
+      temperature.controller.value.setRawValue(0);
+      tint.controller.value.setRawValue(0);
+      contrast.controller.value.setRawValue(0.5);
+      HSVH.controller.value.setRawValue(0);
+      HSVS.controller.value.setRawValue(0);
+      HSVV.controller.value.setRawValue(0);
+    });
+
+    const info = `press 'e' key\nto export as image`;
+    pane.addBinding({info: info}, 'info', {
+      readonly: true,
+      multiline: true,
     });
   }
   init(): void {
