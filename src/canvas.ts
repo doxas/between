@@ -2,8 +2,6 @@ import { BladeApi } from '@tweakpane/core';
 import { Pane } from 'tweakpane';
 import { ShaderProgram, WebGLUtility } from './webgl';
 
-// TODO: 画像を保存するところを作る
-
 export class Renderer {
   private parent: HTMLElement;
   private canvas: HTMLCanvasElement;
