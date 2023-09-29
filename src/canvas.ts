@@ -104,10 +104,10 @@ export class Renderer {
       min: -1.0,
       max: 1.0,
     }).on('change', (v) => { this.uHSV[2] = v.value; });
-    const btn = pane.addButton({
+    const resetButton = pane.addButton({
       title: 'reset',
     });
-    btn.on('click', () => {
+    resetButton.on('click', () => {
       // reset values
       this.uCrevice[0] = 0.0;
       this.uCrevice[1] = 0.0;
@@ -118,7 +118,6 @@ export class Renderer {
       this.uHSV[1] = 0.0;
       this.uHSV[2] = 0.0;
       // reset inputs
-      creviceX.controller.value.setRawValue(0);
       creviceX.controller.value.setRawValue(0);
       creviceY.controller.value.setRawValue(0);
       temperature.controller.value.setRawValue(0);
