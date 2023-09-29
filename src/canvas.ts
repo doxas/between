@@ -16,6 +16,7 @@ export class Renderer {
   private glCanvas: HTMLCanvasElement;
   private gl: WebGLRenderingContext;
   private isRendering: boolean;
+  private isFixed: boolean;
   private texture: WebGLTexture;
   private vertexShaderSource: string;
   private fragmentShaderSource: string;
@@ -149,14 +150,18 @@ export class Renderer {
 
     const info = `press 'e' key
 to export as image.
+press 'f' key
+fix pointer.
 `;
     pane.addBinding({info: info}, 'info', {
       readonly: true,
       multiline: true,
+      rows: 5,
     });
   }
   init(): void {
     this.isRendering = false;
+    this.isFixed = false;
     if (this.gl == null) {
       throw new Error('webgl not support.');
     }
@@ -331,6 +336,9 @@ to export as image.
         case 'e':
           this.export();
           break;
+        case 'f':
+          this.isFixed = !this.isFixed;
+          break;
         default:
           break;
       }
@@ -393,6 +401,7 @@ to export as image.
     }, false);
 
     this.canvas.addEventListener('pointermove', (pointerEvent) => {
+      if (this.isFixed === true) {return;}
       const x = pointerEvent.pageX / window.innerWidth * 2.0 - 1.0;
       const y = pointerEvent.pageY / window.innerHeight * 2.0 - 1.0;
       this.uMouse[0] = x;
