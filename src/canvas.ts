@@ -148,10 +148,10 @@ export class Renderer {
       HSVV.controller.value.setRawValue(this.uHSV[2]);
     });
 
-    const info = `press 'e' key
+    const info = `> press 'e' key
 to export as image.
-press 'f' key
-fix pointer.
+> press 'f' key
+to fix pointer.
 `;
     pane.addBinding({info: info}, 'info', {
       readonly: true,
