@@ -118,17 +118,38 @@ export class Renderer {
       this.uHSV[1] = 0.0;
       this.uHSV[2] = 0.0;
       // reset inputs
-      creviceX.controller.value.setRawValue(0);
-      creviceY.controller.value.setRawValue(0);
-      temperature.controller.value.setRawValue(0);
-      tint.controller.value.setRawValue(0);
-      contrast.controller.value.setRawValue(0.5);
-      HSVH.controller.value.setRawValue(0);
-      HSVS.controller.value.setRawValue(0);
-      HSVV.controller.value.setRawValue(0);
+      creviceX.controller.value.setRawValue(this.uCrevice[0]);
+      creviceY.controller.value.setRawValue(this.uCrevice[1]);
+      temperature.controller.value.setRawValue(this.uTemperature);
+      tint.controller.value.setRawValue(this.uTint);
+      contrast.controller.value.setRawValue(this.uContrast);
+      HSVH.controller.value.setRawValue(this.uHSV[0]);
+      HSVS.controller.value.setRawValue(this.uHSV[1]);
+      HSVV.controller.value.setRawValue(this.uHSV[2]);
+    });
+    const randomButton = pane.addButton({
+      title: 'randomize',
+    });
+    randomButton.on('click', () => {
+      // randomize values
+      this.uTemperature = Math.random() * (1.67 * 2.0) - 1.67;
+      this.uTint = Math.random() * (1.67 * 2.0) - 1.67;
+      this.uContrast = Math.random();
+      this.uHSV[0] = Math.random();
+      this.uHSV[1] = Math.random() * 2.0 - 1.0;
+      this.uHSV[2] = Math.random() * 2.0 - 1.0;
+      // set to inputs
+      temperature.controller.value.setRawValue(this.uTemperature);
+      tint.controller.value.setRawValue(this.uTint);
+      contrast.controller.value.setRawValue(this.uContrast);
+      HSVH.controller.value.setRawValue(this.uHSV[0]);
+      HSVS.controller.value.setRawValue(this.uHSV[1]);
+      HSVV.controller.value.setRawValue(this.uHSV[2]);
     });
 
-    const info = `press 'e' key\nto export as image`;
+    const info = `press 'e' key
+to export as image.
+`;
     pane.addBinding({info: info}, 'info', {
       readonly: true,
       multiline: true,
