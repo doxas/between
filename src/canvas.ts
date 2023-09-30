@@ -110,8 +110,6 @@ export class Renderer {
     });
     resetButton.on('click', () => {
       // reset values
-      this.uCrevice[0] = 0.0;
-      this.uCrevice[1] = 0.0;
       this.uTemperature = 0.0;
       this.uTint = 0.0;
       this.uContrast = 0.5;
@@ -119,8 +117,6 @@ export class Renderer {
       this.uHSV[1] = 0.0;
       this.uHSV[2] = 0.0;
       // reset inputs
-      creviceX.controller.value.setRawValue(this.uCrevice[0]);
-      creviceY.controller.value.setRawValue(this.uCrevice[1]);
       temperature.controller.value.setRawValue(this.uTemperature);
       tint.controller.value.setRawValue(this.uTint);
       contrast.controller.value.setRawValue(this.uContrast);
