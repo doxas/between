@@ -40,6 +40,8 @@ export class Renderer {
   private uTint: number;
   private uContrast: number;
   private uHSV: number[];
+  private uIsMosaic: boolean;
+  private uMosaic: number;
 
   constructor(parent: HTMLElement) {
     this.parent = parent;
@@ -105,6 +107,11 @@ export class Renderer {
       min: -1.0,
       max: 1.0,
     }).on('change', (v) => { this.uHSV[2] = v.value; });
+    const isMosaic = pane.addBinding({'mosaic': this.uIsMosaic}, 'mosaic').on('change', (v) => { this.uIsMosaic = v.value; });
+    const mosaic = pane.addBinding({'mosaic': this.uMosaic}, 'mosaic', {
+      min: 1.0,
+      max: 200.0,
+    }).on('change', (v) => { this.uMosaic = v.value; });
     const resetButton = pane.addButton({
       title: 'reset',
     });
@@ -116,6 +123,7 @@ export class Renderer {
       this.uHSV[0] = 0.0;
       this.uHSV[1] = 0.0;
       this.uHSV[2] = 0.0;
+      this.uMosaic = 100.0;
       // reset inputs
       temperature.controller.value.setRawValue(this.uTemperature);
       tint.controller.value.setRawValue(this.uTint);
@@ -123,6 +131,7 @@ export class Renderer {
       HSVH.controller.value.setRawValue(this.uHSV[0]);
       HSVS.controller.value.setRawValue(this.uHSV[1]);
       HSVV.controller.value.setRawValue(this.uHSV[2]);
+      mosaic.controller.value.setRawValue(this.uMosaic);
     });
     const randomButton = pane.addButton({
       title: 'randomize',
@@ -135,6 +144,7 @@ export class Renderer {
       this.uHSV[0] = Math.random();
       this.uHSV[1] = Math.random() * 2.0 - 1.0;
       this.uHSV[2] = Math.random() * 2.0 - 1.0;
+      this.uMosaic = Math.random() * 199.0 + 1.0;
       // set to inputs
       temperature.controller.value.setRawValue(this.uTemperature);
       tint.controller.value.setRawValue(this.uTint);
@@ -142,6 +152,7 @@ export class Renderer {
       HSVH.controller.value.setRawValue(this.uHSV[0]);
       HSVS.controller.value.setRawValue(this.uHSV[1]);
       HSVV.controller.value.setRawValue(this.uHSV[2]);
+      mosaic.controller.value.setRawValue(this.uMosaic);
     });
 
     const info = `> press 'e' key
@@ -237,6 +248,8 @@ to fix pointer.
         'temperature',
         'tint',
         'contrastIntensity',
+        'isMosaic',
+        'mosaic',
       ],
       type: [
         'uniform2fv',
@@ -247,6 +260,8 @@ to fix pointer.
         'uniform3fv',
         'uniform1f',
         'uniform1f',
+        'uniform1f',
+        'uniform1i',
         'uniform1f',
       ],
     };
@@ -262,6 +277,8 @@ to fix pointer.
     this.uTint = 0.0;
     this.uContrast = 0.5;
     this.uHSV = [0.0, 0.0, 0.0];
+    this.uIsMosaic = false;
+    this.uMosaic = 100.0;
   }
   update(): void {
     if (this.gl == null || this.image == null) {return;}
@@ -295,6 +312,8 @@ to fix pointer.
       this.uTemperature,
       this.uTint,
       this.uContrast,
+      this.uIsMosaic,
+      this.uMosaic,
     ];
 
     if (this.exportFunction != null) {

@@ -1,9 +1,12 @@
 precision highp float;
+uniform float resourceAspect;
 uniform sampler2D inputTexture;
 uniform vec3 hsv;
 uniform float temperature; // -1.67 ~ 1.67
 uniform float tint; // -1.67 ~ 1.67
 uniform float contrastIntensity; // 0.0 ~ 1.0
+uniform bool isMosaic;
+uniform float mosaic; // 1.0 ~ 200.0
 varying vec2 vTexCoord;
 
 const float EPS = 1.0e-10;
@@ -77,7 +80,15 @@ vec3 contrast(vec3 color, float base){
 }
 
 void main() {
-  vec4 samplerColor = texture2D(inputTexture, vTexCoord);
+  vec2 texCoord = vTexCoord;
+
+  if (isMosaic) {
+    texCoord = (vTexCoord * 2.0 - 1.0) * vec2(resourceAspect, 1.0);
+    texCoord = floor(texCoord * mosaic) / mosaic;
+    texCoord = (texCoord / vec2(resourceAspect, 1.0)) * 0.5 + 0.5;
+  }
+
+  vec4 samplerColor = texture2D(inputTexture, texCoord);
   vec3 balanced = whiteBalance(samplerColor.rgb, temperature, tint);
   vec3 contrasted = contrast(balanced, contrastIntensity);
   vec3 hsvColor = RGB2HSV(contrasted);
