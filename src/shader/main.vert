@@ -29,5 +29,6 @@ void main() {
     p.y *= canvasAspect;
   }
 
-  gl_Position = vec4(p, 0.0, 1.0);
+  // to render as large as possible
+  gl_Position = vec4(p * 1.25, 0.0, 1.0);
 }
