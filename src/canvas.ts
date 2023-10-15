@@ -398,6 +398,25 @@ to fix pointer.
           break;
         case 'f':
           this.isFixed = !this.isFixed;
+          break
+        case 'j':
+          const parameters = {
+            uCrevice: this.uCrevice,
+            uMouse: this.uMouse,
+            uTemperature: this.uTemperature,
+            uTint: this.uTint,
+            uContrast: this.uContrast,
+            uHSV: this.uHSV,
+            uMosaic: this.uMosaic,
+            uShift: this.uShift,
+            isTemperature: this.isTemperature,
+            isTint: this.isTint,
+            isContrast: this.isContrast,
+            isHSV: this.isHSV,
+            isMosaic: this.isMosaic,
+            isShift: this.isShift,
+          };
+          Renderer.downloadJson(parameters);
           break;
         default:
           break;
@@ -494,5 +513,16 @@ to fix pointer.
     } else {
       return (v & (v - 1)) === 0;
     }
+  }
+  static downloadJson(value) {
+    const isString = Object.prototype.toString.call(value) === '[object String]';
+    const v = isString === true ? value : JSON.stringify(value, null, '  ');
+    const blob = new Blob([v], {type: 'application\/json'});
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.setAttribute('download', 'between.json');
+    anchor.click();
+    URL.revokeObjectURL(url);
   }
 }
