@@ -42,6 +42,10 @@ export class Renderer {
   private uHSV: number[];
   private uMosaic: number;
   private uShift: number[];
+  private isTemperature: boolean;
+  private isTint: boolean;
+  private isContrast: boolean;
+  private isHSV: boolean;
   private isMosaic: boolean;
   private isShift: boolean;
 
@@ -85,18 +89,22 @@ export class Renderer {
       min: 0,
       max: 1.0,
     }).on('change', (v) => { this.uCrevice[1] = v.value; });
+    const isTemperature = pane.addBinding({'temperature': this.isTemperature}, 'temperature').on('change', (v) => { this.isTemperature = v.value; });
     const temperature = pane.addBinding({'temperature': this.uTemperature}, 'temperature', {
       min: -1.67,
       max: 1.67,
     }).on('change', (v) => { this.uTemperature = v.value; });
+    const isTint = pane.addBinding({'tint': this.isTint}, 'tint').on('change', (v) => { this.isTint = v.value; });
     const tint = pane.addBinding({'tint': this.uTint}, 'tint', {
       min: -1.67,
       max: 1.67,
     }).on('change', (v) => { this.uTint = v.value; });
+    const isContrast = pane.addBinding({'contrast': this.isContrast}, 'contrast').on('change', (v) => { this.isContrast = v.value; });
     const contrast = pane.addBinding({'contrast': this.uContrast}, 'contrast', {
       min: 0.0,
       max: 1.0,
     }).on('change', (v) => { this.uContrast = v.value; });
+    const isHSV = pane.addBinding({'hsv': this.isHSV}, 'hsv').on('change', (v) => { this.isHSV = v.value; });
     const HSVH = pane.addBinding({'hsv-H': this.uHSV[0]}, 'hsv-H', {
       min: 0.0,
       max: 1.0,
@@ -172,7 +180,7 @@ export class Renderer {
       shiftY.controller.value.setRawValue(this.uShift[1]);
     });
 
-    const info = `drag on drop image.
+    const info = `drag and drop image.
 
 > press 'e' key
 to export as image.
@@ -298,6 +306,10 @@ to fix pointer.
     this.uHSV = [0.0, 0.0, 0.0];
     this.uMosaic = 100.0;
     this.uShift = [0.0, 0.0];
+    this.isTemperature = true;
+    this.isTint = true;
+    this.isContrast = true;
+    this.isHSV = true;
     this.isMosaic = false;
     this.isShift = false;
   }
@@ -329,10 +341,10 @@ to fix pointer.
       this.uCanvasAspect,
       this.uResourceAspect,
       0,
-      this.uHSV,
-      this.uTemperature,
-      this.uTint,
-      this.uContrast,
+      this.isHSV ? this.uHSV : [0.0, 0.0, 0.0],
+      this.isTemperature ? this.uTemperature : 0.0,
+      this.isTint ? this.uTint : 0.0,
+      this.isContrast ? this.uContrast : 0.5,
       this.isMosaic ? this.uMosaic : -1.0,
       this.isShift ? this.uShift : [0.0, 0.0],
     ];
