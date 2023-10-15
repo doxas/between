@@ -160,14 +160,26 @@ export class Renderer {
     });
     randomButton.on('click', () => {
       // randomize values
-      this.uTemperature = Math.random() * (1.67 * 2.0) - 1.67;
-      this.uTint = Math.random() * (1.67 * 2.0) - 1.67;
-      this.uContrast = Math.random();
-      this.uHSV[0] = Math.random();
-      this.uHSV[1] = Math.random() * 2.0 - 1.0;
-      this.uHSV[2] = Math.random() * 2.0 - 1.0;
-      this.uMosaic = Math.random() * 199.0 + 1.0;
-      this.uShift = [Math.random() * 0.4 - 0.2, Math.random() * 0.4 - 0.2];
+      if (this.isTemperature === true) {
+        this.uTemperature = Math.random() * (1.67 * 2.0) - 1.67;
+      }
+      if (this.isTint === true) {
+        this.uTint = Math.random() * (1.67 * 2.0) - 1.67;
+      }
+      if (this.isContrast === true) {
+        this.uContrast = Math.random();
+      }
+      if (this.isHSV === true) {
+        this.uHSV[0] = Math.random();
+        this.uHSV[1] = Math.random() * 2.0 - 1.0;
+        this.uHSV[2] = Math.random() * 2.0 - 1.0;
+      }
+      if (this.isMosaic === true) {
+        this.uMosaic = Math.random() * 199.0 + 1.0;
+      }
+      if (this.isShift === true) {
+        this.uShift = [Math.random() * 0.4 - 0.2, Math.random() * 0.4 - 0.2];
+      }
       // set to inputs
       temperature.controller.value.setRawValue(this.uTemperature);
       tint.controller.value.setRawValue(this.uTint);
