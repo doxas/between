@@ -79,6 +79,17 @@ vec3 contrast(vec3 color, float base){
   );
 }
 
+vec3 grading(vec2 texCoord) {
+  vec4 samplerColor = texture2D(inputTexture, texCoord);
+  vec3 balanced = whiteBalance(samplerColor.rgb, temperature, tint);
+  vec3 contrasted = contrast(balanced, contrastIntensity);
+  vec3 hsvColor = RGB2HSV(contrasted);
+  hsvColor.x = fract(hsvColor.x + hsv.x);
+  hsvColor.y = clamp(hsvColor.y + hsv.y, 0.0, 1.0);
+  hsvColor.z = clamp(hsvColor.z + hsv.z, 0.0, 1.0);
+  return HSV2RGB(hsvColor);
+}
+
 void main() {
   vec2 texCoord = vTexCoord;
 
@@ -88,12 +99,6 @@ void main() {
     texCoord = (texCoord / vec2(resourceAspect, 1.0)) * 0.5 + 0.5;
   }
 
-  vec4 samplerColor = texture2D(inputTexture, texCoord);
-  vec3 balanced = whiteBalance(samplerColor.rgb, temperature, tint);
-  vec3 contrasted = contrast(balanced, contrastIntensity);
-  vec3 hsvColor = RGB2HSV(contrasted);
-  hsvColor.x = fract(hsvColor.x + hsv.x);
-  hsvColor.y = clamp(hsvColor.y + hsv.y, 0.0, 1.0);
-  hsvColor.z = clamp(hsvColor.z + hsv.z, 0.0, 1.0);
-  gl_FragColor = vec4(HSV2RGB(hsvColor), 1.0);
+  vec3 rgb = grading(texCoord);
+  gl_FragColor = vec4(rgb, 1.0);
 }
