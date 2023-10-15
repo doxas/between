@@ -40,8 +40,10 @@ export class Renderer {
   private uTint: number;
   private uContrast: number;
   private uHSV: number[];
-  private uIsMosaic: boolean;
   private uMosaic: number;
+  private uShift: number[];
+  private isMosaic: boolean;
+  private isShift: boolean;
 
   constructor(parent: HTMLElement) {
     this.parent = parent;
@@ -107,11 +109,20 @@ export class Renderer {
       min: -1.0,
       max: 1.0,
     }).on('change', (v) => { this.uHSV[2] = v.value; });
-    const isMosaic = pane.addBinding({'mosaic': this.uIsMosaic}, 'mosaic').on('change', (v) => { this.uIsMosaic = v.value; });
+    const isMosaic = pane.addBinding({'mosaic': this.isMosaic}, 'mosaic').on('change', (v) => { this.isMosaic = v.value; });
     const mosaic = pane.addBinding({'mosaic': this.uMosaic}, 'mosaic', {
       min: 1.0,
       max: 200.0,
     }).on('change', (v) => { this.uMosaic = v.value; });
+    const isShift = pane.addBinding({'shift': this.isShift}, 'shift').on('change', (v) => { this.isShift = v.value; });
+    const shiftX = pane.addBinding({'shift-x': this.uShift[0]}, 'shift-x', {
+      min: -0.2,
+      max: 0.2,
+    }).on('change', (v) => { this.uShift[0] = v.value; });
+    const shiftY = pane.addBinding({'shift-y': this.uShift[1]}, 'shift-y', {
+      min: -0.2,
+      max: 0.2,
+    }).on('change', (v) => { this.uShift[1] = v.value; });
     const resetButton = pane.addButton({
       title: 'reset',
     });
@@ -124,6 +135,7 @@ export class Renderer {
       this.uHSV[1] = 0.0;
       this.uHSV[2] = 0.0;
       this.uMosaic = 100.0;
+      this.uShift = [0.0, 0.0];
       // reset inputs
       temperature.controller.value.setRawValue(this.uTemperature);
       tint.controller.value.setRawValue(this.uTint);
@@ -132,6 +144,8 @@ export class Renderer {
       HSVS.controller.value.setRawValue(this.uHSV[1]);
       HSVV.controller.value.setRawValue(this.uHSV[2]);
       mosaic.controller.value.setRawValue(this.uMosaic);
+      shiftX.controller.value.setRawValue(this.uShift[0]);
+      shiftY.controller.value.setRawValue(this.uShift[1]);
     });
     const randomButton = pane.addButton({
       title: 'randomize',
@@ -145,6 +159,7 @@ export class Renderer {
       this.uHSV[1] = Math.random() * 2.0 - 1.0;
       this.uHSV[2] = Math.random() * 2.0 - 1.0;
       this.uMosaic = Math.random() * 199.0 + 1.0;
+      this.uShift = [Math.random() * 0.4 - 0.2, Math.random() * 0.4 - 0.2];
       // set to inputs
       temperature.controller.value.setRawValue(this.uTemperature);
       tint.controller.value.setRawValue(this.uTint);
@@ -153,9 +168,13 @@ export class Renderer {
       HSVS.controller.value.setRawValue(this.uHSV[1]);
       HSVV.controller.value.setRawValue(this.uHSV[2]);
       mosaic.controller.value.setRawValue(this.uMosaic);
+      shiftX.controller.value.setRawValue(this.uShift[0]);
+      shiftY.controller.value.setRawValue(this.uShift[1]);
     });
 
-    const info = `> press 'e' key
+    const info = `drag on drop image.
+
+> press 'e' key
 to export as image.
 > press 'f' key
 to fix pointer.
@@ -163,7 +182,7 @@ to fix pointer.
     pane.addBinding({info: info}, 'info', {
       readonly: true,
       multiline: true,
-      rows: 5,
+      rows: 10,
     });
   }
   init(): void {
@@ -248,8 +267,8 @@ to fix pointer.
         'temperature',
         'tint',
         'contrastIntensity',
-        'isMosaic',
         'mosaic',
+        'shift',
       ],
       type: [
         'uniform2fv',
@@ -261,8 +280,8 @@ to fix pointer.
         'uniform1f',
         'uniform1f',
         'uniform1f',
-        'uniform1i',
         'uniform1f',
+        'uniform2fv',
       ],
     };
     this.shaderProgram = new ShaderProgram(gl, option);
@@ -277,8 +296,10 @@ to fix pointer.
     this.uTint = 0.0;
     this.uContrast = 0.5;
     this.uHSV = [0.0, 0.0, 0.0];
-    this.uIsMosaic = false;
     this.uMosaic = 100.0;
+    this.uShift = [0.0, 0.0];
+    this.isMosaic = false;
+    this.isShift = false;
   }
   update(): void {
     if (this.gl == null || this.image == null) {return;}
@@ -312,8 +333,8 @@ to fix pointer.
       this.uTemperature,
       this.uTint,
       this.uContrast,
-      this.uIsMosaic,
-      this.uMosaic,
+      this.isMosaic ? this.uMosaic : -1.0,
+      this.isShift ? this.uShift : [0.0, 0.0],
     ];
 
     if (this.exportFunction != null) {

@@ -5,8 +5,8 @@ uniform vec3 hsv;
 uniform float temperature; // -1.67 ~ 1.67
 uniform float tint; // -1.67 ~ 1.67
 uniform float contrastIntensity; // 0.0 ~ 1.0
-uniform bool isMosaic;
 uniform float mosaic; // 1.0 ~ 200.0
+uniform vec2 shift; // -0.2 ~ 0.2
 varying vec2 vTexCoord;
 
 const float EPS = 1.0e-10;
@@ -93,12 +93,19 @@ vec3 grading(vec2 texCoord) {
 void main() {
   vec2 texCoord = vTexCoord;
 
-  if (isMosaic) {
+  if (mosaic > 0.0) {
     texCoord = (vTexCoord * 2.0 - 1.0) * vec2(resourceAspect, 1.0);
     texCoord = floor(texCoord * mosaic + 0.5) / mosaic;
     texCoord = (texCoord / vec2(resourceAspect, 1.0)) * 0.5 + 0.5;
   }
 
-  vec3 rgb = grading(texCoord);
+  vec2 rCoord = texCoord - shift;
+  vec2 gCoord = texCoord;
+  vec2 bCoord = texCoord + shift;
+  vec3 rgb = vec3(
+    grading(rCoord).r,
+    grading(gCoord).g,
+    grading(bCoord).b
+  );
   gl_FragColor = vec4(rgb, 1.0);
 }
