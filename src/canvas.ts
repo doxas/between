@@ -16,7 +16,6 @@ export class Renderer {
   private glCanvas: HTMLCanvasElement;
   private gl: WebGLRenderingContext;
   private isRendering: boolean;
-  private isFixed: boolean;
   private texture: WebGLTexture;
   private vertexShaderSource: string;
   private fragmentShaderSource: string;
@@ -42,12 +41,14 @@ export class Renderer {
   private uHSV: number[];
   private uMosaic: number;
   private uShift: number[];
+  private isFixed: boolean;
   private isTemperature: boolean;
   private isTint: boolean;
   private isContrast: boolean;
   private isHSV: boolean;
   private isMosaic: boolean;
   private isShift: boolean;
+  private gui: any;
 
   constructor(parent: HTMLElement) {
     this.parent = parent;
@@ -195,15 +196,34 @@ export class Renderer {
     const info = `drag and drop image.
 
 > press 'e' key
-to export as image.
+  to export as image.
 > press 'f' key
-to fix pointer.
-`;
+  to fix pointer.
+> press 'j' key
+  export json.
+> press 'i' key
+  import json.`;
     pane.addBinding({info: info}, 'info', {
       readonly: true,
       multiline: true,
       rows: 10,
     });
+
+    this.gui = {
+      uCrevice: [creviceX, creviceY],
+      uTemperature: temperature,
+      uTint: tint,
+      uContrast: contrast,
+      uHSV: [HSVH, HSVS, HSVV],
+      uMosaic: mosaic,
+      uShift: [shiftX, shiftY],
+      isTemperature: isTemperature,
+      isTint: isTint,
+      isContrast: isContrast,
+      isHSV: isHSV,
+      isMosaic: isMosaic,
+      isShift: isShift
+    };
   }
   init(): void {
     this.isRendering = false;
@@ -401,6 +421,7 @@ to fix pointer.
           break
         case 'i':
           Renderer.importJson().then((json) => {
+            // TODO: validate value and type
             this.uCrevice = json.uCrevice;
             this.uMouse = json.uMouse;
             this.uTemperature = json.uTemperature;
@@ -415,6 +436,24 @@ to fix pointer.
             this.isHSV = json.isHSV;
             this.isMosaic = json.isMosaic;
             this.isShift = json.isShift;
+
+            this.gui.uCrevice[0].controller.value.setRawValue(this.uCrevice[0]);
+            this.gui.uCrevice[1].controller.value.setRawValue(this.uCrevice[1]);
+            this.gui.uTemperature.controller.value.setRawValue(this.uTemperature);
+            this.gui.uTint.controller.value.setRawValue(this.uTint);
+            this.gui.uContrast.controller.value.setRawValue(this.uContrast);
+            this.gui.uHSV[0].controller.value.setRawValue(this.uHSV[0]);
+            this.gui.uHSV[1].controller.value.setRawValue(this.uHSV[1]);
+            this.gui.uHSV[2].controller.value.setRawValue(this.uHSV[2]);
+            this.gui.uMosaic.controller.value.setRawValue(this.uMosaic);
+            this.gui.uShift[0].controller.value.setRawValue(this.uShift[0]);
+            this.gui.uShift[1].controller.value.setRawValue(this.uShift[1]);
+            this.gui.isTemperature.controller.value.setRawValue(this.isTemperature);
+            this.gui.isTint.controller.value.setRawValue(this.isTint);
+            this.gui.isContrast.controller.value.setRawValue(this.isContrast);
+            this.gui.isHSV.controller.value.setRawValue(this.isHSV);
+            this.gui.isMosaic.controller.value.setRawValue(this.isMosaic);
+            this.gui.isShift.controller.value.setRawValue(this.isShift);
           });
           break
         case 'j':
