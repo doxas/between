@@ -399,6 +399,24 @@ to fix pointer.
         case 'f':
           this.isFixed = !this.isFixed;
           break
+        case 'i':
+          Renderer.importJson().then((json) => {
+            this.uCrevice = json.uCrevice;
+            this.uMouse = json.uMouse;
+            this.uTemperature = json.uTemperature;
+            this.uTint = json.uTint;
+            this.uContrast = json.uContrast;
+            this.uHSV = json.uHSV;
+            this.uMosaic = json.uMosaic;
+            this.uShift = json.uShift;
+            this.isTemperature = json.isTemperature;
+            this.isTint = json.isTint;
+            this.isContrast = json.isContrast;
+            this.isHSV = json.isHSV;
+            this.isMosaic = json.isMosaic;
+            this.isShift = json.isShift;
+          });
+          break
         case 'j':
           const parameters = {
             uCrevice: this.uCrevice,
@@ -514,7 +532,7 @@ to fix pointer.
       return (v & (v - 1)) === 0;
     }
   }
-  static downloadJson(value) {
+  static downloadJson(value): void {
     const isString = Object.prototype.toString.call(value) === '[object String]';
     const v = isString === true ? value : JSON.stringify(value, null, '  ');
     const blob = new Blob([v], {type: 'application\/json'});
@@ -525,4 +543,25 @@ to fix pointer.
     anchor.click();
     URL.revokeObjectURL(url);
   }
+  static importJson(): Promise<any> {
+    return new Promise((resolve, reject) => {
+      const input = document.createElement('input');
+      input.setAttribute('type', 'file');
+      input.addEventListener('change', () => {
+        if (input.files[0] == null) {
+          reject();
+          return;
+        }
+        const file = input.files[0];
+        const reader = new FileReader();
+        reader.addEventListener('load', () => {
+          const text = reader.result as string;
+          resolve(JSON.parse(text));
+        });
+        reader.readAsText(file);
+      }, false);
+      input.click();
+    });
+  }
+
 }
