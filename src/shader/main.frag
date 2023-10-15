@@ -84,7 +84,7 @@ void main() {
 
   if (isMosaic) {
     texCoord = (vTexCoord * 2.0 - 1.0) * vec2(resourceAspect, 1.0);
-    texCoord = floor(texCoord * mosaic) / mosaic;
+    texCoord = floor(texCoord * mosaic + 0.5) / mosaic;
     texCoord = (texCoord / vec2(resourceAspect, 1.0)) * 0.5 + 0.5;
   }
 
