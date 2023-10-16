@@ -35,6 +35,7 @@ export class Renderer {
   private uMouse: number[];
   private uCanvasAspect: number;
   private uResourceAspect: number;
+  private uVertexScale: number;
   private uTemperature: number;
   private uTint: number;
   private uContrast: number;
@@ -90,6 +91,10 @@ export class Renderer {
       min: 0,
       max: 1.0,
     }).on('change', (v) => { this.uCrevice[1] = v.value; });
+    const vertexScale = pane.addBinding({'scale': this.uVertexScale}, 'scale', {
+      min: 1.0,
+      max: 2.0,
+    }).on('change', (v) => { this.uVertexScale = v.value; });
     const isTemperature = pane.addBinding({'temperature': this.isTemperature}, 'temperature').on('change', (v) => { this.isTemperature = v.value; });
     const temperature = pane.addBinding({'temperature': this.uTemperature}, 'temperature', {
       min: -1.67,
@@ -302,6 +307,7 @@ export class Renderer {
         'mouse',
         'canvasAspect',
         'resourceAspect',
+        'vertexScale',
         'inputTexture',
         'hsv',
         'temperature',
@@ -313,6 +319,7 @@ export class Renderer {
       type: [
         'uniform2fv',
         'uniform2fv',
+        'uniform1f',
         'uniform1f',
         'uniform1f',
         'uniform1i',
@@ -332,6 +339,7 @@ export class Renderer {
 
     this.uCrevice = [0, 0];
     this.uMouse = [0.0, 0.0];
+    this.uVertexScale = 1.0;
     this.uTemperature = 0.0;
     this.uTint = 0.0;
     this.uContrast = 0.5;
@@ -372,6 +380,7 @@ export class Renderer {
       this.uMouse,
       this.uCanvasAspect,
       this.uResourceAspect,
+      this.uVertexScale,
       0,
       this.isHSV ? this.uHSV : [0.0, 0.0, 0.0],
       this.isTemperature ? this.uTemperature : 0.0,
