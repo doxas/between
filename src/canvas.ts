@@ -391,8 +391,10 @@ export class Renderer {
     ];
 
     if (this.exportFunction != null) {
-      const width = this.imageWidth + this.imageWidth * this.uCrevice[0] * 2.0;
-      const height = this.imageHeight + this.imageHeight * this.uCrevice[1] * 2.0;
+      const iw = 1.0 / (1.0 - this.uCrevice[0]);
+      const ih = 1.0 / (1.0 - this.uCrevice[1]);
+      const width = this.imageWidth * iw;
+      const height = this.imageHeight * ih;
       this.glCanvas.width = width;
       this.glCanvas.height = height;
       this.uCanvasAspect = width / height;
