@@ -339,7 +339,7 @@ export class Renderer {
 
     this.uCrevice = [0, 0];
     this.uMouse = [0.0, 0.0];
-    this.uVertexScale = 1.0;
+    this.uVertexScale = 1.25;
     this.uTemperature = 0.0;
     this.uTint = 0.0;
     this.uContrast = 0.5;
