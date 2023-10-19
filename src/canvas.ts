@@ -42,6 +42,9 @@ export class Renderer {
   private uHSV: number[];
   private uMosaic: number;
   private uShift: number[];
+  private uNoiseIntensity: number[];
+  private uNoiseScale: number[];
+  private uNoiseTime: number;
   private uSNoiseIntensity: number[];
   private uSNoiseScale: number[];
   private uSNoiseTime: number;
@@ -52,6 +55,7 @@ export class Renderer {
   private isHSV: boolean;
   private isMosaic: boolean;
   private isShift: boolean;
+  private isNoise: boolean;
   private isSNoise: boolean;
   private gui: any;
 
@@ -141,44 +145,48 @@ export class Renderer {
       min: -0.2,
       max: 0.2,
     }).on('change', (v) => { this.uShift[1] = v.value; });
+    const isNoise = pane.addBinding({'noise': this.isNoise}, 'noise').on('change', (v) => { this.isNoise = v.value; });
+    const noiseIntensityX = pane.addBinding({'n-ix': this.uNoiseIntensity[0]}, 'n-ix', {
+      min: -0.5,
+      max: 0.5,
+    }).on('change', (v) => { this.uNoiseIntensity[0] = v.value; });
+    const noiseIntensityY = pane.addBinding({'n-iy': this.uNoiseIntensity[1]}, 'n-iy', {
+      min: -0.5,
+      max: 0.5,
+    }).on('change', (v) => { this.uNoiseIntensity[1] = v.value; });
+    const noiseScaleX = pane.addBinding({'n-sx': this.uNoiseScale[0]}, 'n-sx', {
+      min: 1.0,
+      max: 10.0,
+    }).on('change', (v) => { this.uNoiseScale[0] = v.value; });
+    const noiseScaleY = pane.addBinding({'n-sy': this.uNoiseScale[1]}, 'n-sy', {
+      min: 1.0,
+      max: 10.0,
+    }).on('change', (v) => { this.uNoiseScale[1] = v.value; });
+    const noiseTime = pane.addBinding({'n-time': this.uNoiseTime}, 'n-time', {
+      min: 0.0,
+      max: 10.0,
+    }).on('change', (v) => { this.uNoiseTime = v.value; });
     const isSNoise = pane.addBinding({'snoise': this.isSNoise}, 'snoise').on('change', (v) => { this.isSNoise = v.value; });
-    const sNoiseIntensityX = pane.addBinding({'snoise-ix': this.uSNoiseIntensity[0]}, 'snoise-ix', {
+    const sNoiseIntensityX = pane.addBinding({'sn-ix': this.uSNoiseIntensity[0]}, 'sn-ix', {
       min: -0.5,
       max: 0.5,
     }).on('change', (v) => { this.uSNoiseIntensity[0] = v.value; });
-    const sNoiseIntensityY = pane.addBinding({'snoise-iy': this.uSNoiseIntensity[1]}, 'snoise-iy', {
+    const sNoiseIntensityY = pane.addBinding({'sn-iy': this.uSNoiseIntensity[1]}, 'sn-iy', {
       min: -0.5,
       max: 0.5,
     }).on('change', (v) => { this.uSNoiseIntensity[1] = v.value; });
-    const sNoiseScaleX = pane.addBinding({'snoise-sx': this.uSNoiseScale[0]}, 'snoise-sx', {
+    const sNoiseScaleX = pane.addBinding({'sn-sx': this.uSNoiseScale[0]}, 'sn-sx', {
       min: 1.0,
       max: 10.0,
     }).on('change', (v) => { this.uSNoiseScale[0] = v.value; });
-    const sNoiseScaleY = pane.addBinding({'snoise-sy': this.uSNoiseScale[1]}, 'snoise-sy', {
+    const sNoiseScaleY = pane.addBinding({'sn-sy': this.uSNoiseScale[1]}, 'sn-sy', {
       min: 1.0,
       max: 10.0,
     }).on('change', (v) => { this.uSNoiseScale[1] = v.value; });
-    const sNoiseTime = pane.addBinding({'snoise-time': this.uSNoiseTime}, 'snoise-time', {
+    const sNoiseTime = pane.addBinding({'sn-time': this.uSNoiseTime}, 'sn-time', {
       min: 0.0,
       max: 10.0,
     }).on('change', (v) => { this.uSNoiseTime = v.value; });
-    // const isSNoise = pane.addBinding({'snoise': this.isSNoise}, 'snoise').on('change', (v) => { this.isSNoise = v.value; });
-    // const noiseIntensityX = pane.addBinding({'snoise-ix': this.uSNoiseIntensity[0]}, 'snoise-ix', {
-    //   min: -2.0,
-    //   max: 2.0,
-    // }).on('change', (v) => { this.uSNoiseIntensity[0] = v.value; });
-    // const noiseIntensityY = pane.addBinding({'snoise-iy': this.uSNoiseIntensity[1]}, 'snoise-iy', {
-    //   min: -2.0,
-    //   max: 2.0,
-    // }).on('change', (v) => { this.uNoiseIntensity[1] = v.value; });
-    // const noiseScaleX = pane.addBinding({'noise-sx': this.uNoiseScale[0]}, 'noise-sx', {
-    //   min: 1.0,
-    //   max: 100.0,
-    // }).on('change', (v) => { this.uNoiseScale[0] = v.value; });
-    // const noiseScaleY = pane.addBinding({'noise-sy': this.uNoiseScale[1]}, 'noise-sy', {
-    //   min: 1.0,
-    //   max: 100.0,
-    // }).on('change', (v) => { this.uNoiseScale[1] = v.value; });
     const resetButton = pane.addButton({
       title: 'reset',
     });
@@ -192,11 +200,12 @@ export class Renderer {
       this.uHSV[2] = 0.0;
       this.uMosaic = 100.0;
       this.uShift = [0.0, 0.0];
+      this.uNoiseIntensity = [0.0, 0.0];
+      this.uNoiseScale = [1.0, 1.0];
+      this.uNoiseTime = 0.0;
       this.uSNoiseIntensity = [0.0, 0.0];
       this.uSNoiseScale = [1.0, 1.0];
       this.uSNoiseTime = 0.0;
-      // this.uNoiseIntensity = [0.0, 0.0];
-      // this.uNoiseScale = [1.0, 1.0];
       // reset inputs
       temperature.controller.value.setRawValue(this.uTemperature);
       tint.controller.value.setRawValue(this.uTint);
@@ -207,15 +216,16 @@ export class Renderer {
       mosaic.controller.value.setRawValue(this.uMosaic);
       shiftX.controller.value.setRawValue(this.uShift[0]);
       shiftY.controller.value.setRawValue(this.uShift[1]);
+      noiseIntensityX.controller.value.setRawValue(this.uNoiseIntensity[0]);
+      noiseIntensityY.controller.value.setRawValue(this.uNoiseIntensity[1]);
+      noiseScaleX.controller.value.setRawValue(this.uNoiseScale[0]);
+      noiseScaleY.controller.value.setRawValue(this.uNoiseScale[1]);
+      noiseTime.controller.value.setRawValue(this.uNoiseTime);
       sNoiseIntensityX.controller.value.setRawValue(this.uSNoiseIntensity[0]);
       sNoiseIntensityY.controller.value.setRawValue(this.uSNoiseIntensity[1]);
       sNoiseScaleX.controller.value.setRawValue(this.uSNoiseScale[0]);
       sNoiseScaleY.controller.value.setRawValue(this.uSNoiseScale[1]);
       sNoiseTime.controller.value.setRawValue(this.uSNoiseTime);
-      // noiseIntensityX.controller.value.setRawValue(this.uNoiseIntensity[0]);
-      // noiseIntensityY.controller.value.setRawValue(this.uNoiseIntensity[1]);
-      // noiseScaleX.controller.value.setRawValue(this.uNoiseScale[0]);
-      // noiseScaleY.controller.value.setRawValue(this.uNoiseScale[1]);
     });
     const randomButton = pane.addButton({
       title: 'randomize',
@@ -242,10 +252,11 @@ export class Renderer {
       if (this.isShift === true) {
         this.uShift = [Math.random() * 0.4 - 0.2, Math.random() * 0.4 - 0.2];
       }
-      // if (this.isSNoise === true) {
-      //   this.uSNoiseIntensity = [Math.random() * 4.0 - 2.0, Math.random() * 4.0 - 2.0];
-      //   this.uSNoiseScale = [Math.random() * 100.0, Math.random() * 100.0];
-      // }
+      if (this.isNoise === true) {
+        this.uNoiseIntensity = [Math.random() * 4.0 - 2.0, Math.random() * 4.0 - 2.0];
+        this.uNoiseScale = [Math.random() * 9.0 + 1.0, Math.random() * 9.0 + 1.0];
+        this.uNoiseTime = Math.random() * 10.0;
+      }
       if (this.isSNoise === true) {
         this.uSNoiseIntensity = [Math.random() * 4.0 - 2.0, Math.random() * 4.0 - 2.0];
         this.uSNoiseScale = [Math.random() * 9.0 + 1.0, Math.random() * 9.0 + 1.0];
@@ -261,10 +272,11 @@ export class Renderer {
       mosaic.controller.value.setRawValue(this.uMosaic);
       shiftX.controller.value.setRawValue(this.uShift[0]);
       shiftY.controller.value.setRawValue(this.uShift[1]);
-      // noiseIntensityX.controller.value.setRawValue(this.uNoiseIntensity[0]);
-      // noiseIntensityY.controller.value.setRawValue(this.uNoiseIntensity[1]);
-      // noiseScaleX.controller.value.setRawValue(this.uNoiseScale[0]);
-      // noiseScaleY.controller.value.setRawValue(this.uNoiseScale[1]);
+      noiseIntensityX.controller.value.setRawValue(this.uNoiseIntensity[0]);
+      noiseIntensityY.controller.value.setRawValue(this.uNoiseIntensity[1]);
+      noiseScaleX.controller.value.setRawValue(this.uNoiseScale[0]);
+      noiseScaleY.controller.value.setRawValue(this.uNoiseScale[1]);
+      noiseTime.controller.value.setRawValue(this.uNoiseTime);
       sNoiseIntensityX.controller.value.setRawValue(this.uSNoiseIntensity[0]);
       sNoiseIntensityY.controller.value.setRawValue(this.uSNoiseIntensity[1]);
       sNoiseScaleX.controller.value.setRawValue(this.uSNoiseScale[0]);
@@ -296,18 +308,19 @@ export class Renderer {
       uHSV: [HSVH, HSVS, HSVV],
       uMosaic: mosaic,
       uShift: [shiftX, shiftY],
-      // uNoiseIntensity: [noiseIntensityX, noiseIntensityY],
-      // uNoiseScale: [noiseScaleX, noiseScaleY],
+      uNoiseIntensity: [noiseIntensityX, noiseIntensityY],
+      uNoiseScale: [noiseScaleX, noiseScaleY],
+      uNoiseTime: noiseTime,
       uSNoiseIntensity: [sNoiseIntensityX, sNoiseIntensityY],
       uSNoiseScale: [sNoiseScaleX, sNoiseScaleY],
-      uSNoiseTime: this.uSNoiseTime,
+      uSNoiseTime: sNoiseTime,
       isTemperature: isTemperature,
       isTint: isTint,
       isContrast: isContrast,
       isHSV: isHSV,
       isMosaic: isMosaic,
       isShift: isShift,
-      // isNoise: isNoise,
+      isNoise: isNoise,
       isSNoise: isSNoise,
     };
   }
@@ -396,8 +409,9 @@ export class Renderer {
         'contrastIntensity',
         'mosaic',
         'shift',
-        // 'noiseIntensity',
-        // 'noiseScale',
+        'noiseIntensity',
+        'noiseScale',
+        'noiseTime',
         'sNoiseIntensity',
         'sNoiseScale',
         'sNoiseTime',
@@ -415,8 +429,9 @@ export class Renderer {
         'uniform1f',
         'uniform1f',
         'uniform2fv',
-        // 'uniform2fv',
-        // 'uniform2fv',
+        'uniform2fv',
+        'uniform2fv',
+        'uniform1f',
         'uniform2fv',
         'uniform2fv',
         'uniform1f',
@@ -437,8 +452,9 @@ export class Renderer {
     this.uHSV = [0.0, 0.0, 0.0];
     this.uMosaic = 100.0;
     this.uShift = [0.0, 0.0];
-    // this.uNoiseIntensity = [0.0, 0.0];
-    // this.uNoiseScale = [1.0, 1.0];
+    this.uNoiseIntensity = [0.0, 0.0];
+    this.uNoiseScale = [1.0, 1.0];
+    this.uNoiseTime = 0.0;
     this.uSNoiseIntensity = [0.0, 0.0];
     this.uSNoiseScale = [1.0, 1.0];
     this.uSNoiseTime = 0.0;
@@ -448,7 +464,7 @@ export class Renderer {
     this.isHSV = true;
     this.isMosaic = false;
     this.isShift = false;
-    // this.isNoise = false;
+    this.isNoise = false;
     this.isSNoise = false;
   }
   update(): void {
@@ -486,8 +502,9 @@ export class Renderer {
       this.isContrast ? this.uContrast : 0.5,
       this.isMosaic ? this.uMosaic : -1.0,
       this.isShift ? this.uShift : [0.0, 0.0],
-      // this.isNoise ? this.uNoiseIntensity : [0.0, 0.0],
-      // this.isNoise ? this.uNoiseScale : [1.0, 1.0],
+      this.isNoise ? this.uNoiseIntensity : [0.0, 0.0],
+      this.isNoise ? this.uNoiseScale : [1.0, 1.0],
+      this.uNoiseTime,
       this.isSNoise ? this.uSNoiseIntensity : [0.0, 0.0],
       this.isSNoise ? this.uSNoiseScale : [1.0, 1.0],
       this.uSNoiseTime,
@@ -544,8 +561,9 @@ export class Renderer {
             this.uHSV = json.uHSV;
             this.uMosaic = json.uMosaic;
             this.uShift = json.uShift;
-            // this.uNoiseIntensity = json.uNoiseIntensity;
-            // this.uNoiseScale = json.uNoiseScale;
+            this.uNoiseIntensity = json.uNoiseIntensity;
+            this.uNoiseScale = json.uNoiseScale;
+            this.uNoiseTime = json.uNoiseTime;
             this.uSNoiseIntensity = json.uSNoiseIntensity;
             this.uSNoiseScale = json.uSNoiseScale;
             this.uSNoiseTime = json.uSNoiseTime;
@@ -555,7 +573,7 @@ export class Renderer {
             this.isHSV = json.isHSV;
             this.isMosaic = json.isMosaic;
             this.isShift = json.isShift;
-            // this.isNoise = json.isNoise;
+            this.isNoise = json.isNoise;
             this.isSNoise = json.isSNoise;
 
             this.gui.uCrevice[0].controller.value.setRawValue(this.uCrevice[0]);
@@ -569,10 +587,11 @@ export class Renderer {
             this.gui.uMosaic.controller.value.setRawValue(this.uMosaic);
             this.gui.uShift[0].controller.value.setRawValue(this.uShift[0]);
             this.gui.uShift[1].controller.value.setRawValue(this.uShift[1]);
-            // this.gui.uNoiseIntensity[0].controller.value.setRawValue(this.uNoiseIntensity[0]);
-            // this.gui.uNoiseIntensity[1].controller.value.setRawValue(this.uNoiseIntensity[1]);
-            // this.gui.uNoiseScale[0].controller.value.setRawValue(this.uNoiseScale[0]);
-            // this.gui.uNoiseScale[1].controller.value.setRawValue(this.uNoiseScale[1]);
+            this.gui.uNoiseIntensity[0].controller.value.setRawValue(this.uNoiseIntensity[0]);
+            this.gui.uNoiseIntensity[1].controller.value.setRawValue(this.uNoiseIntensity[1]);
+            this.gui.uNoiseScale[0].controller.value.setRawValue(this.uNoiseScale[0]);
+            this.gui.uNoiseScale[1].controller.value.setRawValue(this.uNoiseScale[1]);
+            this.gui.uNoiseTime.controller.value.setRawValue(this.uNoiseTime);
             this.gui.uSNoiseIntensity[0].controller.value.setRawValue(this.uSNoiseIntensity[0]);
             this.gui.uSNoiseIntensity[1].controller.value.setRawValue(this.uSNoiseIntensity[1]);
             this.gui.uSNoiseScale[0].controller.value.setRawValue(this.uSNoiseScale[0]);
@@ -584,6 +603,8 @@ export class Renderer {
             this.gui.isHSV.controller.value.setRawValue(this.isHSV);
             this.gui.isMosaic.controller.value.setRawValue(this.isMosaic);
             this.gui.isShift.controller.value.setRawValue(this.isShift);
+            this.gui.isNoise.controller.value.setRawValue(this.isNoise);
+            this.gui.isSNoise.controller.value.setRawValue(this.isSNoise);
           });
           break
         case 'j':
@@ -596,8 +617,9 @@ export class Renderer {
             uHSV: this.uHSV,
             uMosaic: this.uMosaic,
             uShift: this.uShift,
-            // uNoiseIntensity: this.uSNoiseIntensity,
-            // uNoiseScale: this.uSNoiseScale,
+            uNoiseIntensity: this.uNoiseIntensity,
+            uNoiseScale: this.uNoiseScale,
+            uNoiseTime: this.uNoiseTime,
             uSNoiseIntensity: this.uSNoiseIntensity,
             uSNoiseScale: this.uSNoiseScale,
             uSNoiseTime: this.uSNoiseTime,
@@ -607,7 +629,7 @@ export class Renderer {
             isHSV: this.isHSV,
             isMosaic: this.isMosaic,
             isShift: this.isShift,
-            // isNoise: this.isNoise,
+            isNoise: this.isNoise,
             isSNoise: this.isSNoise,
           };
           Renderer.downloadJson(parameters);
