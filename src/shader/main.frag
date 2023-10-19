@@ -327,14 +327,14 @@ float fsnoiseDigits(vec2 c){return fract(sin(dot(c, vec2(0.129898, 0.78233))) * 
 void main() {
   vec2 texCoord = vTexCoord;
 
-  vec2 sNoiseCoord = texCoord * sNoiseScale;
+  vec2 sNoiseCoord = (10.0 + texCoord) * sNoiseScale;
   vec3 sn = (snoise3D(vec3(sNoiseCoord, sNoiseTime)) * 2.0 - 1.0) * vec3(sNoiseIntensity, 1.0);
   texCoord += sn.xy;
 
   vec2 noiseCoord = floor(texCoord * noiseScale) / noiseScale;
   float fn = fsnoise(noiseCoord + noiseTime);
   vec2 fNoiseCoord = step(fn, noiseTime) * fn * noiseIntensity;
-  texCoord += fNoiseCoord;
+  texCoord += fNoiseCoord * sign(noiseTime);
 
   if (mosaic > 0.0) {
     texCoord = (texCoord * 2.0 - 1.0) * vec2(resourceAspect, 1.0);

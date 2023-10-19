@@ -255,11 +255,14 @@ export class Renderer {
       if (this.isNoise === true) {
         this.uNoiseIntensity = [Math.random() * 20.0 - 10.0, Math.random() * 20.0 - 10.0];
         this.uNoiseScale = [Math.random() * 499.0 + 1.0, Math.random() * 499.0 + 1.0];
-        this.uNoiseTime = Math.random();
+        // dare to make different
+        this.uNoiseTime = Math.random() * 0.1;
       }
       if (this.isSNoise === true) {
-        this.uSNoiseIntensity = [Math.random() * 4.0 - 2.0, Math.random() * 4.0 - 2.0];
-        this.uSNoiseScale = [Math.random() * 10.0, Math.random() * 10.0];
+        // dare to make different
+        this.uSNoiseIntensity = [Math.random() * 0.2 - 0.1, Math.random() * 0.2 - 0.1];
+        // dare to make different
+        this.uSNoiseScale = [Math.random() * 5.0, Math.random() * 5.0];
         this.uSNoiseTime = Math.random() * 10.0;
       }
       // set to inputs
