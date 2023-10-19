@@ -91,103 +91,108 @@ export class Renderer {
   paneSetting(): void {
     const pane = new Pane();
 
-    const creviceX = pane.addBinding({'crevice-x': this.uCrevice[0]}, 'crevice-x', {
+    const basicFolder = pane.addFolder({title: 'basic'});
+    const creviceX = basicFolder.addBinding({'crevice-x': this.uCrevice[0]}, 'crevice-x', {
       min: 0,
       max: 1.0,
     }).on('change', (v) => { this.uCrevice[0] = v.value; });
-    const creviceY = pane.addBinding({'crevice-y': this.uCrevice[1]}, 'crevice-y', {
+    const creviceY = basicFolder.addBinding({'crevice-y': this.uCrevice[1]}, 'crevice-y', {
       min: 0,
       max: 1.0,
     }).on('change', (v) => { this.uCrevice[1] = v.value; });
-    const vertexScale = pane.addBinding({'scale': this.uVertexScale}, 'scale', {
+    const vertexScale = basicFolder.addBinding({'scale': this.uVertexScale}, 'scale', {
       min: 1.0,
       max: 2.0,
     }).on('change', (v) => { this.uVertexScale = v.value; });
-    const isTemperature = pane.addBinding({'temperature': this.isTemperature}, 'temperature').on('change', (v) => { this.isTemperature = v.value; });
-    const temperature = pane.addBinding({'temperature': this.uTemperature}, 'temperature', {
+    const colorFolder = pane.addFolder({title: 'color'});
+    const isTemperature = colorFolder.addBinding({'temperature': this.isTemperature}, 'temperature').on('change', (v) => { this.isTemperature = v.value; });
+    const temperature = colorFolder.addBinding({'temperature': this.uTemperature}, 'temperature', {
       min: -1.67,
       max: 1.67,
     }).on('change', (v) => { this.uTemperature = v.value; });
-    const isTint = pane.addBinding({'tint': this.isTint}, 'tint').on('change', (v) => { this.isTint = v.value; });
-    const tint = pane.addBinding({'tint': this.uTint}, 'tint', {
+    const isTint = colorFolder.addBinding({'tint': this.isTint}, 'tint').on('change', (v) => { this.isTint = v.value; });
+    const tint = colorFolder.addBinding({'tint': this.uTint}, 'tint', {
       min: -1.67,
       max: 1.67,
     }).on('change', (v) => { this.uTint = v.value; });
-    const isContrast = pane.addBinding({'contrast': this.isContrast}, 'contrast').on('change', (v) => { this.isContrast = v.value; });
-    const contrast = pane.addBinding({'contrast': this.uContrast}, 'contrast', {
+    const isContrast = colorFolder.addBinding({'contrast': this.isContrast}, 'contrast').on('change', (v) => { this.isContrast = v.value; });
+    const contrast = colorFolder.addBinding({'contrast': this.uContrast}, 'contrast', {
       min: 0.0,
       max: 1.0,
     }).on('change', (v) => { this.uContrast = v.value; });
-    const isHSV = pane.addBinding({'hsv': this.isHSV}, 'hsv').on('change', (v) => { this.isHSV = v.value; });
-    const HSVH = pane.addBinding({'hsv-H': this.uHSV[0]}, 'hsv-H', {
+    const isHSV = colorFolder.addBinding({'hsv': this.isHSV}, 'hsv').on('change', (v) => { this.isHSV = v.value; });
+    const HSVH = colorFolder.addBinding({'hsv-H': this.uHSV[0]}, 'hsv-H', {
       min: 0.0,
       max: 1.0,
     }).on('change', (v) => { this.uHSV[0] = v.value; });
-    const HSVS = pane.addBinding({'hsv-S': this.uHSV[1]}, 'hsv-S', {
+    const HSVS = colorFolder.addBinding({'hsv-S': this.uHSV[1]}, 'hsv-S', {
       min: -1.0,
       max: 1.0,
     }).on('change', (v) => { this.uHSV[1] = v.value; });
-    const HSVV = pane.addBinding({'hsv-V': this.uHSV[2]}, 'hsv-V', {
+    const HSVV = colorFolder.addBinding({'hsv-V': this.uHSV[2]}, 'hsv-V', {
       min: -1.0,
       max: 1.0,
     }).on('change', (v) => { this.uHSV[2] = v.value; });
-    const isMosaic = pane.addBinding({'mosaic': this.isMosaic}, 'mosaic').on('change', (v) => { this.isMosaic = v.value; });
-    const mosaic = pane.addBinding({'mosaic': this.uMosaic}, 'mosaic', {
+    const distortionFolder = pane.addFolder({title: 'distortion'});
+    const isMosaic = distortionFolder.addBinding({'mosaic': this.isMosaic}, 'mosaic').on('change', (v) => { this.isMosaic = v.value; });
+    const mosaic = distortionFolder.addBinding({'mosaic': this.uMosaic}, 'mosaic', {
       min: 1.0,
       max: 200.0,
     }).on('change', (v) => { this.uMosaic = v.value; });
-    const isShift = pane.addBinding({'shift': this.isShift}, 'shift').on('change', (v) => { this.isShift = v.value; });
-    const shiftX = pane.addBinding({'shift-x': this.uShift[0]}, 'shift-x', {
+    const isShift = distortionFolder.addBinding({'shift': this.isShift}, 'shift').on('change', (v) => { this.isShift = v.value; });
+    const shiftX = distortionFolder.addBinding({'shift-x': this.uShift[0]}, 'shift-x', {
       min: -0.2,
       max: 0.2,
     }).on('change', (v) => { this.uShift[0] = v.value; });
-    const shiftY = pane.addBinding({'shift-y': this.uShift[1]}, 'shift-y', {
+    const shiftY = distortionFolder.addBinding({'shift-y': this.uShift[1]}, 'shift-y', {
       min: -0.2,
       max: 0.2,
     }).on('change', (v) => { this.uShift[1] = v.value; });
-    const isNoise = pane.addBinding({'noise': this.isNoise}, 'noise').on('change', (v) => { this.isNoise = v.value; });
-    const noiseIntensityX = pane.addBinding({'n-ix': this.uNoiseIntensity[0]}, 'n-ix', {
+    const noiseFolder = pane.addFolder({title: 'noise'});
+    const isNoise = noiseFolder.addBinding({'noise': this.isNoise}, 'noise').on('change', (v) => { this.isNoise = v.value; });
+    const noiseIntensityX = noiseFolder.addBinding({'n-ix': this.uNoiseIntensity[0]}, 'n-ix', {
       min: -10.0,
       max: 10.0,
     }).on('change', (v) => { this.uNoiseIntensity[0] = v.value; });
-    const noiseIntensityY = pane.addBinding({'n-iy': this.uNoiseIntensity[1]}, 'n-iy', {
+    const noiseIntensityY = noiseFolder.addBinding({'n-iy': this.uNoiseIntensity[1]}, 'n-iy', {
       min: -10.0,
       max: 10.0,
     }).on('change', (v) => { this.uNoiseIntensity[1] = v.value; });
-    const noiseScaleX = pane.addBinding({'n-sx': this.uNoiseScale[0]}, 'n-sx', {
+    const noiseScaleX = noiseFolder.addBinding({'n-sx': this.uNoiseScale[0]}, 'n-sx', {
       min: 1.0,
       max: 500.0,
     }).on('change', (v) => { this.uNoiseScale[0] = v.value; });
-    const noiseScaleY = pane.addBinding({'n-sy': this.uNoiseScale[1]}, 'n-sy', {
+    const noiseScaleY = noiseFolder.addBinding({'n-sy': this.uNoiseScale[1]}, 'n-sy', {
       min: 1.0,
       max: 500.0,
     }).on('change', (v) => { this.uNoiseScale[1] = v.value; });
-    const noiseTime = pane.addBinding({'n-time': this.uNoiseTime}, 'n-time', {
+    const noiseTime = noiseFolder.addBinding({'n-time': this.uNoiseTime}, 'n-time', {
       min: 0.0,
       max: 1.0,
     }).on('change', (v) => { this.uNoiseTime = v.value; });
-    const isSNoise = pane.addBinding({'snoise': this.isSNoise}, 'snoise').on('change', (v) => { this.isSNoise = v.value; });
-    const sNoiseIntensityX = pane.addBinding({'sn-ix': this.uSNoiseIntensity[0]}, 'sn-ix', {
+    const isSNoise = noiseFolder.addBinding({'s-noise': this.isSNoise}, 's-noise').on('change', (v) => { this.isSNoise = v.value; });
+    const sNoiseIntensityX = noiseFolder.addBinding({'sn-ix': this.uSNoiseIntensity[0]}, 'sn-ix', {
       min: -0.5,
       max: 0.5,
     }).on('change', (v) => { this.uSNoiseIntensity[0] = v.value; });
-    const sNoiseIntensityY = pane.addBinding({'sn-iy': this.uSNoiseIntensity[1]}, 'sn-iy', {
+    const sNoiseIntensityY = noiseFolder.addBinding({'sn-iy': this.uSNoiseIntensity[1]}, 'sn-iy', {
       min: -0.5,
       max: 0.5,
     }).on('change', (v) => { this.uSNoiseIntensity[1] = v.value; });
-    const sNoiseScaleX = pane.addBinding({'sn-sx': this.uSNoiseScale[0]}, 'sn-sx', {
+    const sNoiseScaleX = noiseFolder.addBinding({'sn-sx': this.uSNoiseScale[0]}, 'sn-sx', {
       min: 0.0,
       max: 10.0,
     }).on('change', (v) => { this.uSNoiseScale[0] = v.value; });
-    const sNoiseScaleY = pane.addBinding({'sn-sy': this.uSNoiseScale[1]}, 'sn-sy', {
+    const sNoiseScaleY = noiseFolder.addBinding({'sn-sy': this.uSNoiseScale[1]}, 'sn-sy', {
       min: 0.0,
       max: 10.0,
     }).on('change', (v) => { this.uSNoiseScale[1] = v.value; });
-    const sNoiseTime = pane.addBinding({'sn-time': this.uSNoiseTime}, 'sn-time', {
+    const sNoiseTime = noiseFolder.addBinding({'sn-time': this.uSNoiseTime}, 'sn-time', {
       min: 0.0,
       max: 10.0,
     }).on('change', (v) => { this.uSNoiseTime = v.value; });
-    const resetButton = pane.addButton({
+    const toolFolder = pane.addFolder({title: 'tool and info'});
+    const resetButton = toolFolder.addButton({
       title: 'reset',
     });
     resetButton.on('click', () => {
@@ -227,7 +232,7 @@ export class Renderer {
       sNoiseScaleY.controller.value.setRawValue(this.uSNoiseScale[1]);
       sNoiseTime.controller.value.setRawValue(this.uSNoiseTime);
     });
-    const randomButton = pane.addButton({
+    const randomButton = toolFolder.addButton({
       title: 'randomize',
     });
     randomButton.on('click', () => {
@@ -297,7 +302,7 @@ export class Renderer {
   export json.
 > press 'i' key
   import json.`;
-    pane.addBinding({info: info}, 'info', {
+    toolFolder.addBinding({info: info}, 'info', {
       readonly: true,
       multiline: true,
       rows: 10,
