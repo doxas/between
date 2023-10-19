@@ -255,7 +255,8 @@ export class Renderer {
         this.uMosaic = Math.random() * 199.0 + 1.0;
       }
       if (this.isShift === true) {
-        this.uShift = [Math.random() * 0.4 - 0.2, Math.random() * 0.4 - 0.2];
+        // dare to make different
+        this.uShift = [Math.random() * 0.2 - 0.1, Math.random() * 0.2 - 0.1];
       }
       if (this.isNoise === true) {
         this.uNoiseIntensity = [Math.random() * 20.0 - 10.0, Math.random() * 20.0 - 10.0];

@@ -7,11 +7,11 @@ uniform float tint; // -1.67 ~ 1.67
 uniform float contrastIntensity; // 0.0 ~ 1.0
 uniform float mosaic; // 1.0 ~ 200.0
 uniform vec2 shift; // -0.2 ~ 0.2
-uniform vec2 noiseIntensity; // -0.5 ~ 0.5
-uniform vec2 noiseScale; // 0.0 ~ 5.0
-uniform float noiseTime; // 0.0 ~ 10.0
-uniform vec2 sNoiseIntensity; // -20.5~ 0.5
-uniform vec2 sNoiseScale; // 0.0 ~ 5.0
+uniform vec2 noiseIntensity; // -10.0 ~ 10.0
+uniform vec2 noiseScale; // 1.0 ~ 500.0
+uniform float noiseTime; // 0.0 ~ 1.0
+uniform vec2 sNoiseIntensity; // -0.5~ 0.5
+uniform vec2 sNoiseScale; // 0.0 ~ 10.0
 uniform float sNoiseTime; // 0.0 ~ 10.0
 varying vec2 vTexCoord;
 
@@ -325,23 +325,28 @@ float fsnoise      (vec2 c){return fract(sin(dot(c, vec2(12.9898, 78.233))) * 43
 float fsnoiseDigits(vec2 c){return fract(sin(dot(c, vec2(0.129898, 0.78233))) * 437.585453);}
 
 void main() {
+  // original coordinate
   vec2 texCoord = vTexCoord;
 
+  // smooth-noise
   vec2 sNoiseCoord = (10.0 + texCoord) * sNoiseScale;
   vec3 sn = (snoise3D(vec3(sNoiseCoord, sNoiseTime)) * 2.0 - 1.0) * vec3(sNoiseIntensity, 1.0);
   texCoord += sn.xy;
 
+  // fs-noise
   vec2 noiseCoord = floor(texCoord * noiseScale) / noiseScale;
   float fn = fsnoise(noiseCoord + noiseTime);
   vec2 fNoiseCoord = step(fn, noiseTime) * fn * noiseIntensity;
   texCoord += fNoiseCoord * sign(noiseTime);
 
+  // mosaic
   if (mosaic > 0.0) {
     texCoord = (texCoord * 2.0 - 1.0) * vec2(resourceAspect, 1.0);
     texCoord = floor(texCoord * mosaic + 0.5) / mosaic;
     texCoord = (texCoord / vec2(resourceAspect, 1.0)) * 0.5 + 0.5;
   }
 
+  // rgb-shift
   vec2 rCoord = texCoord - shift;
   vec2 gCoord = texCoord;
   vec2 bCoord = texCoord + shift;
@@ -350,5 +355,7 @@ void main() {
     grading(gCoord).g,
     grading(bCoord).b
   );
+
+  // final output
   gl_FragColor = vec4(rgb, 1.0);
 }
