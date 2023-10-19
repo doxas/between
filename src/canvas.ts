@@ -147,24 +147,24 @@ export class Renderer {
     }).on('change', (v) => { this.uShift[1] = v.value; });
     const isNoise = pane.addBinding({'noise': this.isNoise}, 'noise').on('change', (v) => { this.isNoise = v.value; });
     const noiseIntensityX = pane.addBinding({'n-ix': this.uNoiseIntensity[0]}, 'n-ix', {
-      min: -0.5,
-      max: 0.5,
+      min: -10.0,
+      max: 10.0,
     }).on('change', (v) => { this.uNoiseIntensity[0] = v.value; });
     const noiseIntensityY = pane.addBinding({'n-iy': this.uNoiseIntensity[1]}, 'n-iy', {
-      min: -0.5,
-      max: 0.5,
+      min: -10.0,
+      max: 10.0,
     }).on('change', (v) => { this.uNoiseIntensity[1] = v.value; });
     const noiseScaleX = pane.addBinding({'n-sx': this.uNoiseScale[0]}, 'n-sx', {
       min: 1.0,
-      max: 10.0,
+      max: 500.0,
     }).on('change', (v) => { this.uNoiseScale[0] = v.value; });
     const noiseScaleY = pane.addBinding({'n-sy': this.uNoiseScale[1]}, 'n-sy', {
       min: 1.0,
-      max: 10.0,
+      max: 500.0,
     }).on('change', (v) => { this.uNoiseScale[1] = v.value; });
     const noiseTime = pane.addBinding({'n-time': this.uNoiseTime}, 'n-time', {
       min: 0.0,
-      max: 10.0,
+      max: 1.0,
     }).on('change', (v) => { this.uNoiseTime = v.value; });
     const isSNoise = pane.addBinding({'snoise': this.isSNoise}, 'snoise').on('change', (v) => { this.isSNoise = v.value; });
     const sNoiseIntensityX = pane.addBinding({'sn-ix': this.uSNoiseIntensity[0]}, 'sn-ix', {
@@ -176,11 +176,11 @@ export class Renderer {
       max: 0.5,
     }).on('change', (v) => { this.uSNoiseIntensity[1] = v.value; });
     const sNoiseScaleX = pane.addBinding({'sn-sx': this.uSNoiseScale[0]}, 'sn-sx', {
-      min: 1.0,
+      min: 0.0,
       max: 10.0,
     }).on('change', (v) => { this.uSNoiseScale[0] = v.value; });
     const sNoiseScaleY = pane.addBinding({'sn-sy': this.uSNoiseScale[1]}, 'sn-sy', {
-      min: 1.0,
+      min: 0.0,
       max: 10.0,
     }).on('change', (v) => { this.uSNoiseScale[1] = v.value; });
     const sNoiseTime = pane.addBinding({'sn-time': this.uSNoiseTime}, 'sn-time', {
@@ -202,7 +202,7 @@ export class Renderer {
       this.uShift = [0.0, 0.0];
       this.uNoiseIntensity = [0.0, 0.0];
       this.uNoiseScale = [1.0, 1.0];
-      this.uNoiseTime = 0.0;
+      this.uNoiseTime = 1.0;
       this.uSNoiseIntensity = [0.0, 0.0];
       this.uSNoiseScale = [1.0, 1.0];
       this.uSNoiseTime = 0.0;
@@ -253,13 +253,13 @@ export class Renderer {
         this.uShift = [Math.random() * 0.4 - 0.2, Math.random() * 0.4 - 0.2];
       }
       if (this.isNoise === true) {
-        this.uNoiseIntensity = [Math.random() * 4.0 - 2.0, Math.random() * 4.0 - 2.0];
-        this.uNoiseScale = [Math.random() * 9.0 + 1.0, Math.random() * 9.0 + 1.0];
-        this.uNoiseTime = Math.random() * 10.0;
+        this.uNoiseIntensity = [Math.random() * 20.0 - 10.0, Math.random() * 20.0 - 10.0];
+        this.uNoiseScale = [Math.random() * 499.0 + 1.0, Math.random() * 499.0 + 1.0];
+        this.uNoiseTime = Math.random();
       }
       if (this.isSNoise === true) {
         this.uSNoiseIntensity = [Math.random() * 4.0 - 2.0, Math.random() * 4.0 - 2.0];
-        this.uSNoiseScale = [Math.random() * 9.0 + 1.0, Math.random() * 9.0 + 1.0];
+        this.uSNoiseScale = [Math.random() * 10.0, Math.random() * 10.0];
         this.uSNoiseTime = Math.random() * 10.0;
       }
       // set to inputs
@@ -454,7 +454,7 @@ export class Renderer {
     this.uShift = [0.0, 0.0];
     this.uNoiseIntensity = [0.0, 0.0];
     this.uNoiseScale = [1.0, 1.0];
-    this.uNoiseTime = 0.0;
+    this.uNoiseTime = 1.0;
     this.uSNoiseIntensity = [0.0, 0.0];
     this.uSNoiseScale = [1.0, 1.0];
     this.uSNoiseTime = 0.0;

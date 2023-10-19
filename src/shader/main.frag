@@ -7,10 +7,11 @@ uniform float tint; // -1.67 ~ 1.67
 uniform float contrastIntensity; // 0.0 ~ 1.0
 uniform float mosaic; // 1.0 ~ 200.0
 uniform vec2 shift; // -0.2 ~ 0.2
-// uniform vec2 noiseIntensity; // -2.0 ~ 2.0
-// uniform vec2 noiseScale; // 1.0 ~ 10.0
-uniform vec2 sNoiseIntensity; // -2.0 ~ 2.0
-uniform vec2 sNoiseScale; // 1.0 ~ 10.0
+uniform vec2 noiseIntensity; // -0.5 ~ 0.5
+uniform vec2 noiseScale; // 0.0 ~ 5.0
+uniform float noiseTime; // 0.0 ~ 10.0
+uniform vec2 sNoiseIntensity; // -20.5~ 0.5
+uniform vec2 sNoiseScale; // 0.0 ~ 5.0
 uniform float sNoiseTime; // 0.0 ~ 10.0
 varying vec2 vTexCoord;
 
@@ -330,8 +331,13 @@ void main() {
   vec3 sn = (snoise3D(vec3(sNoiseCoord, sNoiseTime)) * 2.0 - 1.0) * vec3(sNoiseIntensity, 1.0);
   texCoord += sn.xy;
 
+  vec2 noiseCoord = floor(texCoord * noiseScale) / noiseScale;
+  float fn = fsnoise(noiseCoord + noiseTime);
+  vec2 fNoiseCoord = step(fn, noiseTime) * fn * noiseIntensity;
+  texCoord += fNoiseCoord;
+
   if (mosaic > 0.0) {
-    texCoord = (vTexCoord * 2.0 - 1.0) * vec2(resourceAspect, 1.0);
+    texCoord = (texCoord * 2.0 - 1.0) * vec2(resourceAspect, 1.0);
     texCoord = floor(texCoord * mosaic + 0.5) / mosaic;
     texCoord = (texCoord / vec2(resourceAspect, 1.0)) * 0.5 + 0.5;
   }
