@@ -118,7 +118,7 @@ export class Renderer {
     const isContrast = colorFolder.addBinding({'contrast': this.isContrast}, 'contrast').on('change', (v) => { this.isContrast = v.value; });
     const contrast = colorFolder.addBinding({'contrast': this.uContrast}, 'contrast', {
       min: 0.0,
-      max: 1.0,
+      max: 2.0,
     }).on('change', (v) => { this.uContrast = v.value; });
     const isHSV = colorFolder.addBinding({'hsv': this.isHSV}, 'hsv').on('change', (v) => { this.isHSV = v.value; });
     const HSVH = colorFolder.addBinding({'hsv-H': this.uHSV[0]}, 'hsv-H', {
@@ -141,12 +141,12 @@ export class Renderer {
     }).on('change', (v) => { this.uMosaic = v.value; });
     const isShift = distortionFolder.addBinding({'shift': this.isShift}, 'shift').on('change', (v) => { this.isShift = v.value; });
     const shiftX = distortionFolder.addBinding({'shift-x': this.uShift[0]}, 'shift-x', {
-      min: -0.2,
-      max: 0.2,
+      min: -0.05,
+      max: 0.05,
     }).on('change', (v) => { this.uShift[0] = v.value; });
     const shiftY = distortionFolder.addBinding({'shift-y': this.uShift[1]}, 'shift-y', {
-      min: -0.2,
-      max: 0.2,
+      min: -0.05,
+      max: 0.05,
     }).on('change', (v) => { this.uShift[1] = v.value; });
     const noiseFolder = pane.addFolder({title: 'noise'});
     const isNoise = noiseFolder.addBinding({'noise': this.isNoise}, 'noise').on('change', (v) => { this.isNoise = v.value; });
@@ -244,7 +244,7 @@ export class Renderer {
         this.uTint = Math.random() * (1.67 * 2.0) - 1.67;
       }
       if (this.isContrast === true) {
-        this.uContrast = Math.random();
+        this.uContrast = Math.random() * 2.0;
       }
       if (this.isHSV === true) {
         this.uHSV[0] = Math.random();
@@ -256,7 +256,7 @@ export class Renderer {
       }
       if (this.isShift === true) {
         // dare to make different
-        this.uShift = [Math.random() * 0.2 - 0.1, Math.random() * 0.2 - 0.1];
+        this.uShift = [Math.random() * 0.1 - 0.05, Math.random() * 0.1 - 0.05];
       }
       if (this.isNoise === true) {
         this.uNoiseIntensity = [Math.random() * 20.0 - 10.0, Math.random() * 20.0 - 10.0];
