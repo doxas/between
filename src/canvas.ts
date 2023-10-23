@@ -95,16 +95,16 @@ export class Renderer {
   paneSetting(): void {
     const pane = new Pane();
 
-    const basicFolder = pane.addFolder({title: 'basic'});
-    const creviceX = basicFolder.addBinding({'crevice-x': this.uCrevice[0]}, 'crevice-x', {
+    const generalFolder = pane.addFolder({title: 'general'});
+    const creviceX = generalFolder.addBinding({'crevice-x': this.uCrevice[0]}, 'crevice-x', {
       min: 0,
       max: 1.0,
     }).on('change', (v) => { this.uCrevice[0] = v.value; });
-    const creviceY = basicFolder.addBinding({'crevice-y': this.uCrevice[1]}, 'crevice-y', {
+    const creviceY = generalFolder.addBinding({'crevice-y': this.uCrevice[1]}, 'crevice-y', {
       min: 0,
       max: 1.0,
     }).on('change', (v) => { this.uCrevice[1] = v.value; });
-    const vertexScale = basicFolder.addBinding({'scale': this.uVertexScale}, 'scale', {
+    const vertexScale = generalFolder.addBinding({'scale': this.uVertexScale}, 'scale', {
       min: 1.0,
       max: 4.0,
     }).on('change', (v) => { this.uVertexScale = v.value; });
@@ -137,28 +137,28 @@ export class Renderer {
       min: -1.0,
       max: 1.0,
     }).on('change', (v) => { this.uHSV[2] = v.value; });
-    const isSobel = colorFolder.addBinding({'sobel': this.isSobel}, 'sobel').on('change', (v) => { this.isSobel = v.value; });
-    const sobel = colorFolder.addBinding({'sobel': this.uSobel}, 'sobel', {
+    const filterFolder = pane.addFolder({title: 'filter'});
+    const isSobel = filterFolder.addBinding({'sobel': this.isSobel}, 'sobel').on('change', (v) => { this.isSobel = v.value; });
+    const sobel = filterFolder.addBinding({'sobel': this.uSobel}, 'sobel', {
       min: -1.0,
       max: 1.0,
     }).on('change', (v) => { this.uSobel = v.value; });
-    const isBayer = colorFolder.addBinding({'bayer': this.isBayer}, 'bayer').on('change', (v) => { this.isBayer = v.value; });
-    const bayer = colorFolder.addBinding({'bayer': this.uBayer}, 'bayer', {
+    const isBayer = filterFolder.addBinding({'bayer': this.isBayer}, 'bayer').on('change', (v) => { this.isBayer = v.value; });
+    const bayer = filterFolder.addBinding({'bayer': this.uBayer}, 'bayer', {
       min: 1.0,
       max: 400.0,
     }).on('change', (v) => { this.uBayer = v.value; });
-    const distortionFolder = pane.addFolder({title: 'distortion'});
-    const isMosaic = distortionFolder.addBinding({'mosaic': this.isMosaic}, 'mosaic').on('change', (v) => { this.isMosaic = v.value; });
-    const mosaic = distortionFolder.addBinding({'mosaic': this.uMosaic}, 'mosaic', {
+    const isMosaic = filterFolder.addBinding({'mosaic': this.isMosaic}, 'mosaic').on('change', (v) => { this.isMosaic = v.value; });
+    const mosaic = filterFolder.addBinding({'mosaic': this.uMosaic}, 'mosaic', {
       min: 1.0,
       max: 400.0,
     }).on('change', (v) => { this.uMosaic = v.value; });
-    const isShift = distortionFolder.addBinding({'shift': this.isShift}, 'shift').on('change', (v) => { this.isShift = v.value; });
-    const shiftX = distortionFolder.addBinding({'shift-x': this.uShift[0]}, 'shift-x', {
+    const isShift = filterFolder.addBinding({'shift': this.isShift}, 'shift').on('change', (v) => { this.isShift = v.value; });
+    const shiftX = filterFolder.addBinding({'shift-x': this.uShift[0]}, 'shift-x', {
       min: -0.05,
       max: 0.05,
     }).on('change', (v) => { this.uShift[0] = v.value; });
-    const shiftY = distortionFolder.addBinding({'shift-y': this.uShift[1]}, 'shift-y', {
+    const shiftY = filterFolder.addBinding({'shift-y': this.uShift[1]}, 'shift-y', {
       min: -0.05,
       max: 0.05,
     }).on('change', (v) => { this.uShift[1] = v.value; });
