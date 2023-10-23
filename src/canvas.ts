@@ -151,7 +151,7 @@ export class Renderer {
     const isMosaic = distortionFolder.addBinding({'mosaic': this.isMosaic}, 'mosaic').on('change', (v) => { this.isMosaic = v.value; });
     const mosaic = distortionFolder.addBinding({'mosaic': this.uMosaic}, 'mosaic', {
       min: 1.0,
-      max: 200.0,
+      max: 400.0,
     }).on('change', (v) => { this.uMosaic = v.value; });
     const isShift = distortionFolder.addBinding({'shift': this.isShift}, 'shift').on('change', (v) => { this.isShift = v.value; });
     const shiftX = distortionFolder.addBinding({'shift-x': this.uShift[0]}, 'shift-x', {
@@ -218,7 +218,7 @@ export class Renderer {
       this.uHSV[1] = 0.0;
       this.uHSV[2] = 0.0;
       this.uSobel = 0.0;
-      this.uMosaic = 100.0;
+      this.uMosaic = 200.0;
       this.uBayer = 200.0;
       this.uShift = [0.0, 0.0];
       this.uNoiseIntensity = [0.0, 0.0];
@@ -276,6 +276,7 @@ export class Renderer {
         this.uBayer = Math.random() * 399.0 + 1.0;
       }
       if (this.isMosaic === true) {
+        // dare to make different
         this.uMosaic = Math.random() * 199.0 + 1.0;
       }
       if (this.isShift === true) {
@@ -496,8 +497,8 @@ export class Renderer {
     this.uContrast = 0.5;
     this.uHSV = [0.0, 0.0, 0.0];
     this.uSobel = 0.0;
-    this.uMosaic = 100.0;
-    this.uBayer = 150.0;
+    this.uMosaic = 200.0;
+    this.uBayer = 200.0;
     this.uShift = [0.0, 0.0];
     this.uNoiseIntensity = [0.0, 0.0];
     this.uNoiseScale = [1.0, 1.0];
