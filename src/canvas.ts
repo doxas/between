@@ -106,7 +106,7 @@ export class Renderer {
     }).on('change', (v) => { this.uCrevice[1] = v.value; });
     const vertexScale = basicFolder.addBinding({'scale': this.uVertexScale}, 'scale', {
       min: 1.0,
-      max: 2.0,
+      max: 4.0,
     }).on('change', (v) => { this.uVertexScale = v.value; });
     const colorFolder = pane.addFolder({title: 'color'});
     const isTemperature = colorFolder.addBinding({'temperature': this.isTemperature}, 'temperature').on('change', (v) => { this.isTemperature = v.value; });
