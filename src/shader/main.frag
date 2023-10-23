@@ -1,7 +1,9 @@
 precision highp float;
+uniform vec2 resolution;
 uniform float resourceAspect;
 uniform sampler2D inputTexture;
 uniform vec3 hsv;
+uniform float sobel;
 uniform float temperature; // -1.67 ~ 1.67
 uniform float tint; // -1.67 ~ 1.67
 uniform float contrastIntensity; // 0.0 ~ 1.0
@@ -323,7 +325,34 @@ float snoise4D(vec4 v){
 }
 float fsnoise      (vec2 c){return fract(sin(dot(c, vec2(12.9898, 78.233))) * 43758.5453);}
 float fsnoiseDigits(vec2 c){return fract(sin(dot(c, vec2(0.129898, 0.78233))) * 437.585453);}
-
+vec3 sobelOp(vec2 texCoord) {
+  vec2 fragment = 1.0 / resolution;
+  vec2 offset[9];
+  offset[0] = vec2(-1.0,  1.0);
+  offset[1] = vec2( 0.0,  1.0);
+  offset[2] = vec2( 1.0,  1.0);
+  offset[3] = vec2(-1.0,  0.0);
+  offset[4] = vec2( 0.0,  0.0);
+  offset[5] = vec2( 1.0,  0.0);
+  offset[6] = vec2(-1.0, -1.0);
+  offset[7] = vec2( 0.0, -1.0);
+  offset[8] = vec2( 1.0, -1.0);
+  float hKernel[9], vKernel[9];
+  hKernel[0] =  1.0; hKernel[1] =  2.0; hKernel[2] =  1.0;
+  hKernel[3] =  0.0; hKernel[4] =  0.0; hKernel[5] =  0.0;
+  hKernel[6] = -1.0; hKernel[7] = -2.0; hKernel[8] = -1.0;
+  vKernel[0] =  1.0; vKernel[1] =  0.0; vKernel[2] = -1.0;
+  vKernel[3] =  2.0; vKernel[4] =  0.0; vKernel[5] = -2.0;
+  vKernel[6] =  1.0; vKernel[7] =  0.0; vKernel[8] = -1.0;
+  vec3 horizontal = vec3(0.0);
+  vec3 vertical = vec3(0.0);
+  for (int i = 0; i < 9; ++i) {
+    vec2 coord = texCoord + offset[i] * fragment;
+    horizontal += (grading(coord)).rgb * hKernel[i];
+    vertical += (grading(coord)).rgb * vKernel[i];
+  }
+  return sqrt(horizontal * horizontal + vertical * vertical);
+}
 void main() {
   // original coordinate
   vec2 texCoord = vTexCoord;
@@ -346,14 +375,14 @@ void main() {
     texCoord = (texCoord / vec2(resourceAspect, 1.0)) * 0.5 + 0.5;
   }
 
-  // rgb-shift
+  // rgb-shift and sobel
   vec2 rCoord = texCoord - shift;
   vec2 gCoord = texCoord;
   vec2 bCoord = texCoord + shift;
   vec3 rgb = vec3(
-    grading(rCoord).r,
-    grading(gCoord).g,
-    grading(bCoord).b
+    grading(rCoord).r + sobelOp(rCoord).r * sobel,
+    grading(gCoord).g + sobelOp(gCoord).g * sobel,
+    grading(bCoord).b + sobelOp(bCoord).b * sobel
   );
 
   // final output

@@ -40,6 +40,7 @@ export class Renderer {
   private uTint: number;
   private uContrast: number;
   private uHSV: number[];
+  private uSobel: number;
   private uMosaic: number;
   private uShift: number[];
   private uNoiseIntensity: number[];
@@ -57,6 +58,7 @@ export class Renderer {
   private isShift: boolean;
   private isNoise: boolean;
   private isSNoise: boolean;
+  private isSobel: boolean;
   private gui: any;
 
   constructor(parent: HTMLElement) {
@@ -133,6 +135,11 @@ export class Renderer {
       min: -1.0,
       max: 1.0,
     }).on('change', (v) => { this.uHSV[2] = v.value; });
+    const isSobel = colorFolder.addBinding({'sobel': this.isSobel}, 'sobel').on('change', (v) => { this.isSobel = v.value; });
+    const sobel = colorFolder.addBinding({'sobel': this.uSobel}, 'sobel', {
+      min: -1.0,
+      max: 1.0,
+    }).on('change', (v) => { this.uSobel = v.value; });
     const distortionFolder = pane.addFolder({title: 'distortion'});
     const isMosaic = distortionFolder.addBinding({'mosaic': this.isMosaic}, 'mosaic').on('change', (v) => { this.isMosaic = v.value; });
     const mosaic = distortionFolder.addBinding({'mosaic': this.uMosaic}, 'mosaic', {
@@ -203,6 +210,7 @@ export class Renderer {
       this.uHSV[0] = 0.0;
       this.uHSV[1] = 0.0;
       this.uHSV[2] = 0.0;
+      this.uSobel = 0.0;
       this.uMosaic = 100.0;
       this.uShift = [0.0, 0.0];
       this.uNoiseIntensity = [0.0, 0.0];
@@ -218,6 +226,7 @@ export class Renderer {
       HSVH.controller.value.setRawValue(this.uHSV[0]);
       HSVS.controller.value.setRawValue(this.uHSV[1]);
       HSVV.controller.value.setRawValue(this.uHSV[2]);
+      sobel.controller.value.setRawValue(this.uSobel);
       mosaic.controller.value.setRawValue(this.uMosaic);
       shiftX.controller.value.setRawValue(this.uShift[0]);
       shiftY.controller.value.setRawValue(this.uShift[1]);
@@ -251,6 +260,9 @@ export class Renderer {
         this.uHSV[1] = Math.random() * 2.0 - 1.0;
         this.uHSV[2] = Math.random() * 2.0 - 1.0;
       }
+      if (this.isSobel === true) {
+        this.uSobel = Math.random() * 2.0 - 1.0;
+      }
       if (this.isMosaic === true) {
         this.uMosaic = Math.random() * 199.0 + 1.0;
       }
@@ -278,6 +290,7 @@ export class Renderer {
       HSVH.controller.value.setRawValue(this.uHSV[0]);
       HSVS.controller.value.setRawValue(this.uHSV[1]);
       HSVV.controller.value.setRawValue(this.uHSV[2]);
+      sobel.controller.value.setRawValue(this.uSobel);
       mosaic.controller.value.setRawValue(this.uMosaic);
       shiftX.controller.value.setRawValue(this.uShift[0]);
       shiftY.controller.value.setRawValue(this.uShift[1]);
@@ -315,6 +328,7 @@ export class Renderer {
       uTint: tint,
       uContrast: contrast,
       uHSV: [HSVH, HSVS, HSVV],
+      uSobel: sobel,
       uMosaic: mosaic,
       uShift: [shiftX, shiftY],
       uNoiseIntensity: [noiseIntensityX, noiseIntensityY],
@@ -331,6 +345,7 @@ export class Renderer {
       isShift: isShift,
       isNoise: isNoise,
       isSNoise: isSNoise,
+      isSobel: isSobel,
     };
   }
   init(): void {
@@ -406,6 +421,7 @@ export class Renderer {
         2,
       ],
       uniform: [
+        'resolution',
         'crevice',
         'mouse',
         'canvasAspect',
@@ -413,6 +429,7 @@ export class Renderer {
         'vertexScale',
         'inputTexture',
         'hsv',
+        'sobel',
         'temperature',
         'tint',
         'contrastIntensity',
@@ -428,11 +445,13 @@ export class Renderer {
       type: [
         'uniform2fv',
         'uniform2fv',
+        'uniform2fv',
         'uniform1f',
         'uniform1f',
         'uniform1f',
         'uniform1i',
         'uniform3fv',
+        'uniform1f',
         'uniform1f',
         'uniform1f',
         'uniform1f',
@@ -459,6 +478,7 @@ export class Renderer {
     this.uTint = 0.0;
     this.uContrast = 0.5;
     this.uHSV = [0.0, 0.0, 0.0];
+    this.uSobel = 0.0;
     this.uMosaic = 100.0;
     this.uShift = [0.0, 0.0];
     this.uNoiseIntensity = [0.0, 0.0];
@@ -475,6 +495,7 @@ export class Renderer {
     this.isShift = false;
     this.isNoise = false;
     this.isSNoise = false;
+    this.isSobel = false;
   }
   update(): void {
     if (this.gl == null || this.image == null) {return;}
@@ -499,6 +520,7 @@ export class Renderer {
     requestAnimationFrame(this.render);
 
     const uniforms = [
+      [this.imageWidth, this.imageHeight],
       this.uCrevice,
       this.uMouse,
       this.uCanvasAspect,
@@ -506,6 +528,7 @@ export class Renderer {
       this.uVertexScale,
       0,
       this.isHSV ? this.uHSV : [0.0, 0.0, 0.0],
+      this.isSobel ? this.uSobel : 0.0,
       this.isTemperature ? this.uTemperature : 0.0,
       this.isTint ? this.uTint : 0.0,
       this.isContrast ? this.uContrast : 0.5,
@@ -568,6 +591,7 @@ export class Renderer {
             this.uTint = json.uTint;
             this.uContrast = json.uContrast;
             this.uHSV = json.uHSV;
+            this.uSobel = json.uSobel;
             this.uMosaic = json.uMosaic;
             this.uShift = json.uShift;
             this.uNoiseIntensity = json.uNoiseIntensity;
@@ -584,6 +608,7 @@ export class Renderer {
             this.isShift = json.isShift;
             this.isNoise = json.isNoise;
             this.isSNoise = json.isSNoise;
+            this.isSobel = json.isSobel;
 
             this.gui.uCrevice[0].controller.value.setRawValue(this.uCrevice[0]);
             this.gui.uCrevice[1].controller.value.setRawValue(this.uCrevice[1]);
@@ -593,6 +618,7 @@ export class Renderer {
             this.gui.uHSV[0].controller.value.setRawValue(this.uHSV[0]);
             this.gui.uHSV[1].controller.value.setRawValue(this.uHSV[1]);
             this.gui.uHSV[2].controller.value.setRawValue(this.uHSV[2]);
+            this.gui.uSobel.controller.value.setRawValue(this.uSobel);
             this.gui.uMosaic.controller.value.setRawValue(this.uMosaic);
             this.gui.uShift[0].controller.value.setRawValue(this.uShift[0]);
             this.gui.uShift[1].controller.value.setRawValue(this.uShift[1]);
@@ -614,6 +640,7 @@ export class Renderer {
             this.gui.isShift.controller.value.setRawValue(this.isShift);
             this.gui.isNoise.controller.value.setRawValue(this.isNoise);
             this.gui.isSNoise.controller.value.setRawValue(this.isSNoise);
+            this.gui.isSobel.controller.value.setRawValue(this.isSobel);
           });
           break
         case 'j':
@@ -624,6 +651,7 @@ export class Renderer {
             uTint: this.uTint,
             uContrast: this.uContrast,
             uHSV: this.uHSV,
+            uSobel: this.uSobel,
             uMosaic: this.uMosaic,
             uShift: this.uShift,
             uNoiseIntensity: this.uNoiseIntensity,
@@ -640,6 +668,7 @@ export class Renderer {
             isShift: this.isShift,
             isNoise: this.isNoise,
             isSNoise: this.isSNoise,
+            isSobel: this.isSobel,
           };
           Renderer.downloadJson(parameters);
           break;
