@@ -47,6 +47,7 @@ export class Renderer {
   private uToonMin: number;
   private uToonMax: number;
   private uShift: number[];
+  private shiftScale: number;
   private uNoiseIntensity: number[];
   private uNoiseScale: number[];
   private uNoiseTime: number;
@@ -172,13 +173,17 @@ export class Renderer {
       max: 400.0,
     }).on('change', (v) => { this.uBayer = v.value; });
     const isShift = filterFolder.addBinding({'shift': this.isShift}, 'shift').on('change', (v) => { this.isShift = v.value; });
+    const shiftScale = filterFolder.addBinding({'shift-s': this.shiftScale}, 'shift-s', {
+      min: 0.0,
+      max: 0.2,
+    }).on('change', (v) => { this.shiftScale = v.value; });
     const shiftX = filterFolder.addBinding({'shift-x': this.uShift[0]}, 'shift-x', {
-      min: -0.05,
-      max: 0.05,
+      min: -1.0,
+      max: 1.0,
     }).on('change', (v) => { this.uShift[0] = v.value; });
     const shiftY = filterFolder.addBinding({'shift-y': this.uShift[1]}, 'shift-y', {
-      min: -0.05,
-      max: 0.05,
+      min: -1.0,
+      max: 1.0,
     }).on('change', (v) => { this.uShift[1] = v.value; });
     const noiseFolder = pane.addFolder({title: 'noise'});
     const isNoise = noiseFolder.addBinding({'noise': this.isNoise}, 'noise').on('change', (v) => { this.isNoise = v.value; });
@@ -241,6 +246,7 @@ export class Renderer {
       this.uToon = 3.0;
       this.uToonMin = 0.0;
       this.uToonMax = 1.0;
+      this.shiftScale = 0.01;
       this.uShift = [0.0, 0.0];
       this.uNoiseIntensity = [0.0, 0.0];
       this.uNoiseScale = [1.0, 1.0];
@@ -261,6 +267,7 @@ export class Renderer {
       toon.controller.value.setRawValue(this.uToon);
       toonMin.controller.value.setRawValue(this.uToonMin);
       toonMax.controller.value.setRawValue(this.uToonMax);
+      shiftScale.controller.value.setRawValue(this.shiftScale);
       shiftX.controller.value.setRawValue(this.uShift[0]);
       shiftY.controller.value.setRawValue(this.uShift[1]);
       noiseIntensityX.controller.value.setRawValue(this.uNoiseIntensity[0]);
@@ -310,7 +317,8 @@ export class Renderer {
       }
       if (this.isShift === true) {
         // dare to make different
-        this.uShift = [Math.random() * 0.1 - 0.05, Math.random() * 0.1 - 0.05];
+        this.shiftScale = Math.random() * 0.2;
+        this.uShift = [Math.random() * 2.0 - 1.0, Math.random() * 2.0 - 1.0];
       }
       if (this.isNoise === true) {
         this.uNoiseIntensity = [Math.random() * 20.0 - 10.0, Math.random() * 20.0 - 10.0];
@@ -338,6 +346,7 @@ export class Renderer {
       toon.controller.value.setRawValue(this.uToon);
       toonMin.controller.value.setRawValue(this.uToonMin);
       toonMax.controller.value.setRawValue(this.uToonMax);
+      shiftScale.controller.value.setRawValue(this.shiftScale);
       shiftX.controller.value.setRawValue(this.uShift[0]);
       shiftY.controller.value.setRawValue(this.uShift[1]);
       noiseIntensityX.controller.value.setRawValue(this.uNoiseIntensity[0]);
@@ -380,6 +389,7 @@ export class Renderer {
       uToon: toon,
       uToonMin: toonMin,
       uToonMax: toonMax,
+      shiftScale: shiftScale,
       uShift: [shiftX, shiftY],
       uNoiseIntensity: [noiseIntensityX, noiseIntensityY],
       uNoiseScale: [noiseScaleX, noiseScaleY],
@@ -544,6 +554,7 @@ export class Renderer {
     this.uToon = 3.0;
     this.uToonMin = 0.0;
     this.uToonMax = 1.0;
+    this.shiftScale = 0.01;
     this.uShift = [0.0, 0.0];
     this.uNoiseIntensity = [0.0, 0.0];
     this.uNoiseScale = [1.0, 1.0];
@@ -603,7 +614,7 @@ export class Renderer {
       this.isToon ? this.uToon : 0.0,
       this.uToonMin,
       this.uToonMax,
-      this.isShift ? this.uShift : [0.0, 0.0],
+      this.isShift ? [this.uShift[0] * this.shiftScale, this.uShift[1] * this.shiftScale] : [0.0, 0.0],
       this.isNoise ? this.uNoiseIntensity : [0.0, 0.0],
       this.isNoise ? this.uNoiseScale : [1.0, 1.0],
       this.uNoiseTime,
@@ -667,6 +678,7 @@ export class Renderer {
             if (json.uToon != null) {this.uToon = json.uToon;}
             if (json.uToonMin != null) {this.uToonMin = json.uToonMin;}
             if (json.uToonMax != null) {this.uToonMax = json.uToonMax;}
+            if (json.shiftScale != null) {this.shiftScale = json.shiftScale;}
             if (json.uShift != null) {this.uShift = json.uShift;}
             if (json.uNoiseIntensity != null) {this.uNoiseIntensity = json.uNoiseIntensity;}
             if (json.uNoiseScale != null) {this.uNoiseScale = json.uNoiseScale;}
@@ -700,6 +712,7 @@ export class Renderer {
             this.gui.uToon.controller.value.setRawValue(this.uToon);
             this.gui.uToonMin.controller.value.setRawValue(this.uToonMin);
             this.gui.uToonMax.controller.value.setRawValue(this.uToonMax);
+            this.gui.shiftScale.controller.value.setRawValue(this.shiftScale);
             this.gui.uShift[0].controller.value.setRawValue(this.uShift[0]);
             this.gui.uShift[1].controller.value.setRawValue(this.uShift[1]);
             this.gui.uNoiseIntensity[0].controller.value.setRawValue(this.uNoiseIntensity[0]);
@@ -739,6 +752,7 @@ export class Renderer {
             uToon: this.uToon,
             uToonMax: this.uToonMax,
             uToonMin: this.uToonMin,
+            shiftScale: this.shiftScale,
             uShift: this.uShift,
             uNoiseIntensity: this.uNoiseIntensity,
             uNoiseScale: this.uNoiseScale,
