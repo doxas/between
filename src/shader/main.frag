@@ -9,6 +9,9 @@ uniform float tint; // -1.67 ~ 1.67
 uniform float contrastIntensity; // 0.0 ~ 1.0
 uniform float mosaic; // 1.0 ~ 400.0
 uniform float bayer; // 1.0 ~ 400.0
+uniform float toon;
+uniform float toonMin;
+uniform float toonMax;
 uniform vec2 shift; // -0.2 ~ 0.2
 uniform vec2 noiseIntensity; // -10.0 ~ 10.0
 uniform vec2 noiseScale; // 1.0 ~ 500.0
@@ -460,6 +463,13 @@ void main() {
     vec2 floorCoord = floor(aspected * bayer + 0.5);
     vec2 modulo = mod(floorCoord, 8.0);
     rgb = bayer8(ivec2(int(modulo.x), int(modulo.y)), rgb);
+  }
+
+  // toon
+  if (toon > 1.0 && toonMax > toonMin) {
+    float clampRange = toonMax - toonMin;
+    vec3 clamped = (clamp(vec3(toonMin), vec3(toonMax), rgb) - toonMin) / clampRange;
+    rgb = vec3(toonMin) + (floor(clamped * toon) / toon) * clampRange;
   }
 
   // final output

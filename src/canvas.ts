@@ -43,6 +43,9 @@ export class Renderer {
   private uSobel: number;
   private uMosaic: number;
   private uBayer: number;
+  private uToon: number;
+  private uToonMin: number;
+  private uToonMax: number;
   private uShift: number[];
   private uNoiseIntensity: number[];
   private uNoiseScale: number[];
@@ -61,6 +64,7 @@ export class Renderer {
   private isSNoise: boolean;
   private isSobel: boolean;
   private isBayer: boolean;
+  private isToon: boolean;
   private gui: any;
 
   constructor(parent: HTMLElement) {
@@ -148,6 +152,20 @@ export class Renderer {
       min: 1.0,
       max: 400.0,
     }).on('change', (v) => { this.uBayer = v.value; });
+    const isToon = filterFolder.addBinding({'toon': this.isToon}, 'toon').on('change', (v) => { this.isToon = v.value; });
+    const toon = filterFolder.addBinding({'toon': this.uToon}, 'toon', {
+      min: 2.0,
+      max: 10.0,
+      step: 1.0,
+    }).on('change', (v) => { this.uToon = v.value; });
+    const toonMin = filterFolder.addBinding({'toon-min': this.uToonMin}, 'toon-min', {
+      min: 0.0,
+      max: 1.0,
+    }).on('change', (v) => { this.uToonMin = v.value; });
+    const toonMax = filterFolder.addBinding({'toon-max': this.uToonMax}, 'toon-max', {
+      min: 0.0,
+      max: 1.0,
+    }).on('change', (v) => { this.uToonMax = v.value; });
     const isMosaic = filterFolder.addBinding({'mosaic': this.isMosaic}, 'mosaic').on('change', (v) => { this.isMosaic = v.value; });
     const mosaic = filterFolder.addBinding({'mosaic': this.uMosaic}, 'mosaic', {
       min: 1.0,
@@ -220,6 +238,9 @@ export class Renderer {
       this.uSobel = 0.0;
       this.uMosaic = 200.0;
       this.uBayer = 200.0;
+      this.uToon = 3.0;
+      this.uToonMin = 0.0;
+      this.uToonMax = 1.0;
       this.uShift = [0.0, 0.0];
       this.uNoiseIntensity = [0.0, 0.0];
       this.uNoiseScale = [1.0, 1.0];
@@ -237,6 +258,9 @@ export class Renderer {
       sobel.controller.value.setRawValue(this.uSobel);
       mosaic.controller.value.setRawValue(this.uMosaic);
       bayer.controller.value.setRawValue(this.uBayer);
+      toon.controller.value.setRawValue(this.uToon);
+      toonMin.controller.value.setRawValue(this.uToonMin);
+      toonMax.controller.value.setRawValue(this.uToonMax);
       shiftX.controller.value.setRawValue(this.uShift[0]);
       shiftY.controller.value.setRawValue(this.uShift[1]);
       noiseIntensityX.controller.value.setRawValue(this.uNoiseIntensity[0]);
@@ -275,6 +299,11 @@ export class Renderer {
       if (this.isBayer === true) {
         this.uBayer = Math.random() * 399.0 + 1.0;
       }
+      if (this.isToon === true) {
+        this.uToon = Math.floor(Math.random() * 9.0) + 2.0;
+        this.uToonMin = Math.random() * 0.5;
+        this.uToonMax = Math.random() * 0.5 + 0.5;
+      }
       if (this.isMosaic === true) {
         // dare to make different
         this.uMosaic = Math.random() * 199.0 + 1.0;
@@ -306,6 +335,9 @@ export class Renderer {
       sobel.controller.value.setRawValue(this.uSobel);
       mosaic.controller.value.setRawValue(this.uMosaic);
       bayer.controller.value.setRawValue(this.uBayer);
+      toon.controller.value.setRawValue(this.uToon);
+      toonMin.controller.value.setRawValue(this.uToonMin);
+      toonMax.controller.value.setRawValue(this.uToonMax);
       shiftX.controller.value.setRawValue(this.uShift[0]);
       shiftY.controller.value.setRawValue(this.uShift[1]);
       noiseIntensityX.controller.value.setRawValue(this.uNoiseIntensity[0]);
@@ -345,6 +377,9 @@ export class Renderer {
       uSobel: sobel,
       uMosaic: mosaic,
       uBayer: bayer,
+      uToon: toon,
+      uToonMin: toonMin,
+      uToonMax: toonMax,
       uShift: [shiftX, shiftY],
       uNoiseIntensity: [noiseIntensityX, noiseIntensityY],
       uNoiseScale: [noiseScaleX, noiseScaleY],
@@ -362,6 +397,7 @@ export class Renderer {
       isSNoise: isSNoise,
       isSobel: isSobel,
       isBayer: isBayer,
+      isToon: isToon,
     };
   }
   init(): void {
@@ -451,6 +487,9 @@ export class Renderer {
         'contrastIntensity',
         'mosaic',
         'bayer',
+        'toon',
+        'toonMin',
+        'toonMax',
         'shift',
         'noiseIntensity',
         'noiseScale',
@@ -468,6 +507,9 @@ export class Renderer {
         'uniform1f',
         'uniform1i',
         'uniform3fv',
+        'uniform1f',
+        'uniform1f',
+        'uniform1f',
         'uniform1f',
         'uniform1f',
         'uniform1f',
@@ -499,6 +541,9 @@ export class Renderer {
     this.uSobel = 0.0;
     this.uMosaic = 200.0;
     this.uBayer = 200.0;
+    this.uToon = 3.0;
+    this.uToonMin = 0.0;
+    this.uToonMax = 1.0;
     this.uShift = [0.0, 0.0];
     this.uNoiseIntensity = [0.0, 0.0];
     this.uNoiseScale = [1.0, 1.0];
@@ -516,6 +561,7 @@ export class Renderer {
     this.isSNoise = false;
     this.isSobel = false;
     this.isBayer = false;
+    this.isToon = false;
   }
   update(): void {
     if (this.gl == null || this.image == null) {return;}
@@ -554,6 +600,9 @@ export class Renderer {
       this.isContrast ? this.uContrast : 0.5,
       this.isMosaic ? this.uMosaic : -1.0,
       this.isBayer ? this.uBayer : 0.0,
+      this.isToon ? this.uToon : 0.0,
+      this.uToonMin,
+      this.uToonMax,
       this.isShift ? this.uShift : [0.0, 0.0],
       this.isNoise ? this.uNoiseIntensity : [0.0, 0.0],
       this.isNoise ? this.uNoiseScale : [1.0, 1.0],
@@ -615,6 +664,9 @@ export class Renderer {
             this.uSobel = json.uSobel;
             this.uMosaic = json.uMosaic;
             this.uBayer = json.uBayer;
+            this.uToon = json.uToon;
+            this.uToonMin = json.uToonMin;
+            this.uToonMax = json.uToonMax;
             this.uShift = json.uShift;
             this.uNoiseIntensity = json.uNoiseIntensity;
             this.uNoiseScale = json.uNoiseScale;
@@ -632,6 +684,7 @@ export class Renderer {
             this.isSNoise = json.isSNoise;
             this.isSobel = json.isSobel;
             this.isBayer = json.isBayer;
+            this.isToon = json.isToon;
 
             this.gui.uCrevice[0].controller.value.setRawValue(this.uCrevice[0]);
             this.gui.uCrevice[1].controller.value.setRawValue(this.uCrevice[1]);
@@ -644,6 +697,9 @@ export class Renderer {
             this.gui.uSobel.controller.value.setRawValue(this.uSobel);
             this.gui.uMosaic.controller.value.setRawValue(this.uMosaic);
             this.gui.uBayer.controller.value.setRawValue(this.uBayer);
+            this.gui.uToon.controller.value.setRawValue(this.uToon);
+            this.gui.uToonMin.controller.value.setRawValue(this.uToonMin);
+            this.gui.uToonMax.controller.value.setRawValue(this.uToonMax);
             this.gui.uShift[0].controller.value.setRawValue(this.uShift[0]);
             this.gui.uShift[1].controller.value.setRawValue(this.uShift[1]);
             this.gui.uNoiseIntensity[0].controller.value.setRawValue(this.uNoiseIntensity[0]);
@@ -666,6 +722,7 @@ export class Renderer {
             this.gui.isSNoise.controller.value.setRawValue(this.isSNoise);
             this.gui.isSobel.controller.value.setRawValue(this.isSobel);
             this.gui.isBayer.controller.value.setRawValue(this.isBayer);
+            this.gui.isToon.controller.value.setRawValue(this.isToon);
           });
           break
         case 'j':
@@ -679,6 +736,9 @@ export class Renderer {
             uSobel: this.uSobel,
             uMosaic: this.uMosaic,
             uBayer: this.uBayer,
+            uToon: this.uToon,
+            uToonMax: this.uToonMax,
+            uToonMin: this.uToonMin,
             uShift: this.uShift,
             uNoiseIntensity: this.uNoiseIntensity,
             uNoiseScale: this.uNoiseScale,
@@ -696,6 +756,7 @@ export class Renderer {
             isSNoise: this.isSNoise,
             isSobel: this.isSobel,
             isBayer: this.isBayer,
+            isToon: this.isToon,
           };
           Renderer.downloadJson(parameters);
           break;
