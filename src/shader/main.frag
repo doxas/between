@@ -458,18 +458,19 @@ void main() {
     grading(bCoord).b + sobelOp(bCoord).b * sobel
   );
 
+  // toon
+  if (toon > 1.0 && toonMax > toonMin) {
+    float clampRange = toonMax - toonMin;
+    vec3 clamped = (clamp(rgb, vec3(toonMin), vec3(toonMax)) - toonMin) / clampRange;
+    vec3 floored = min((1.0 / (toon - 1.0)) * floor(clamped * toon), 1.0);
+    rgb = vec3(toonMin) + floored * clampRange;
+  }
+
   // bayer
   if (bayer > 0.0) {
     vec2 floorCoord = floor(aspected * bayer + 0.5);
     vec2 modulo = mod(floorCoord, 8.0);
     rgb = bayer8(ivec2(int(modulo.x), int(modulo.y)), rgb);
-  }
-
-  // toon
-  if (toon > 1.0 && toonMax > toonMin) {
-    float clampRange = toonMax - toonMin;
-    vec3 clamped = (clamp(vec3(toonMin), vec3(toonMax), rgb) - toonMin) / clampRange;
-    rgb = vec3(toonMin) + (floor(clamped * toon) / toon) * clampRange;
   }
 
   // final output
