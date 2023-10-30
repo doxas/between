@@ -144,8 +144,8 @@ export class Renderer {
     const filterFolder = pane.addFolder({title: 'filter'});
     const isSobel = filterFolder.addBinding({'sobel': this.isSobel}, 'sobel').on('change', (v) => { this.isSobel = v.value; });
     const sobel = filterFolder.addBinding({'sobel': this.uSobel}, 'sobel', {
-      min: -1.0,
-      max: 1.0,
+      min: -2.0,
+      max: 2.0,
     }).on('change', (v) => { this.uSobel = v.value; });
     const isToon = filterFolder.addBinding({'toon': this.isToon}, 'toon').on('change', (v) => { this.isToon = v.value; });
     const toon = filterFolder.addBinding({'toon': this.uToon}, 'toon', {
@@ -294,7 +294,7 @@ export class Renderer {
         this.uHSV[2] = Math.random() * 2.0 - 1.0;
       }
       if (this.isSobel === true) {
-        this.uSobel = Math.random() * 2.0 - 1.0;
+        this.uSobel = Math.random() * 4.0 - 2.0;
       }
       if (this.isBayer === true) {
         this.uBayer = Math.random() * 399.0 + 1.0;
