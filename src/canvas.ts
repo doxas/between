@@ -147,11 +147,6 @@ export class Renderer {
       min: -1.0,
       max: 1.0,
     }).on('change', (v) => { this.uSobel = v.value; });
-    const isBayer = filterFolder.addBinding({'bayer': this.isBayer}, 'bayer').on('change', (v) => { this.isBayer = v.value; });
-    const bayer = filterFolder.addBinding({'bayer': this.uBayer}, 'bayer', {
-      min: 1.0,
-      max: 400.0,
-    }).on('change', (v) => { this.uBayer = v.value; });
     const isToon = filterFolder.addBinding({'toon': this.isToon}, 'toon').on('change', (v) => { this.isToon = v.value; });
     const toon = filterFolder.addBinding({'toon': this.uToon}, 'toon', {
       min: 2.0,
@@ -171,6 +166,11 @@ export class Renderer {
       min: 1.0,
       max: 400.0,
     }).on('change', (v) => { this.uMosaic = v.value; });
+    const isBayer = filterFolder.addBinding({'bayer': this.isBayer}, 'bayer').on('change', (v) => { this.isBayer = v.value; });
+    const bayer = filterFolder.addBinding({'bayer': this.uBayer}, 'bayer', {
+      min: 1.0,
+      max: 400.0,
+    }).on('change', (v) => { this.uBayer = v.value; });
     const isShift = filterFolder.addBinding({'shift': this.isShift}, 'shift').on('change', (v) => { this.isShift = v.value; });
     const shiftX = filterFolder.addBinding({'shift-x': this.uShift[0]}, 'shift-x', {
       min: -0.05,
@@ -655,36 +655,36 @@ export class Renderer {
         case 'i':
           Renderer.importJson().then((json) => {
             // TODO: validate value and type
-            this.uCrevice = json.uCrevice;
-            this.uMouse = json.uMouse;
-            this.uTemperature = json.uTemperature;
-            this.uTint = json.uTint;
-            this.uContrast = json.uContrast;
-            this.uHSV = json.uHSV;
-            this.uSobel = json.uSobel;
-            this.uMosaic = json.uMosaic;
-            this.uBayer = json.uBayer;
-            this.uToon = json.uToon;
-            this.uToonMin = json.uToonMin;
-            this.uToonMax = json.uToonMax;
-            this.uShift = json.uShift;
-            this.uNoiseIntensity = json.uNoiseIntensity;
-            this.uNoiseScale = json.uNoiseScale;
-            this.uNoiseTime = json.uNoiseTime;
-            this.uSNoiseIntensity = json.uSNoiseIntensity;
-            this.uSNoiseScale = json.uSNoiseScale;
-            this.uSNoiseTime = json.uSNoiseTime;
-            this.isTemperature = json.isTemperature;
-            this.isTint = json.isTint;
-            this.isContrast = json.isContrast;
-            this.isHSV = json.isHSV;
-            this.isMosaic = json.isMosaic;
-            this.isShift = json.isShift;
-            this.isNoise = json.isNoise;
-            this.isSNoise = json.isSNoise;
-            this.isSobel = json.isSobel;
-            this.isBayer = json.isBayer;
-            this.isToon = json.isToon;
+            if (json.uCrevice != null) {this.uCrevice = json.uCrevice;}
+            if (json.uMouse != null) {this.uMouse = json.uMouse;}
+            if (json.uTemperature != null) {this.uTemperature = json.uTemperature;}
+            if (json.uTint != null) {this.uTint = json.uTint;}
+            if (json.uContrast != null) {this.uContrast = json.uContrast;}
+            if (json.uHSV != null) {this.uHSV = json.uHSV;}
+            if (json.uSobel != null) {this.uSobel = json.uSobel;}
+            if (json.uMosaic != null) {this.uMosaic = json.uMosaic;}
+            if (json.uBayer != null) {this.uBayer = json.uBayer;}
+            if (json.uToon != null) {this.uToon = json.uToon;}
+            if (json.uToonMin != null) {this.uToonMin = json.uToonMin;}
+            if (json.uToonMax != null) {this.uToonMax = json.uToonMax;}
+            if (json.uShift != null) {this.uShift = json.uShift;}
+            if (json.uNoiseIntensity != null) {this.uNoiseIntensity = json.uNoiseIntensity;}
+            if (json.uNoiseScale != null) {this.uNoiseScale = json.uNoiseScale;}
+            if (json.uNoiseTime != null) {this.uNoiseTime = json.uNoiseTime;}
+            if (json.uSNoiseIntensity != null) {this.uSNoiseIntensity = json.uSNoiseIntensity;}
+            if (json.uSNoiseScale != null) {this.uSNoiseScale = json.uSNoiseScale;}
+            if (json.uSNoiseTime != null) {this.uSNoiseTime = json.uSNoiseTime;}
+            if (json.isTemperature != null) {this.isTemperature = json.isTemperature;}
+            if (json.isTint != null) {this.isTint = json.isTint;}
+            if (json.isContrast != null) {this.isContrast = json.isContrast;}
+            if (json.isHSV != null) {this.isHSV = json.isHSV;}
+            if (json.isMosaic != null) {this.isMosaic = json.isMosaic;}
+            if (json.isShift != null) {this.isShift = json.isShift;}
+            if (json.isNoise != null) {this.isNoise = json.isNoise;}
+            if (json.isSNoise != null) {this.isSNoise = json.isSNoise;}
+            if (json.isSobel != null) {this.isSobel = json.isSobel;}
+            if (json.isBayer != null) {this.isBayer = json.isBayer;}
+            if (json.isToon != null) {this.isToon = json.isToon;}
 
             this.gui.uCrevice[0].controller.value.setRawValue(this.uCrevice[0]);
             this.gui.uCrevice[1].controller.value.setRawValue(this.uCrevice[1]);
