@@ -185,7 +185,7 @@ export class Renderer {
       min: -1.0,
       max: 1.0,
     }).on('change', (v) => { this.uShift[1] = v.value; });
-    const noiseFolder = pane.addFolder({title: 'noise'});
+    const noiseFolder = pane.addFolder({title: 'noise', expanded: false});
     const isNoise = noiseFolder.addBinding({'noise': this.isNoise}, 'noise').on('change', (v) => { this.isNoise = v.value; });
     const noiseIntensityX = noiseFolder.addBinding({'n-ix': this.uNoiseIntensity[0]}, 'n-ix', {
       min: -10.0,
@@ -228,7 +228,7 @@ export class Renderer {
       min: 0.0,
       max: 10.0,
     }).on('change', (v) => { this.uSNoiseTime = v.value; });
-    const toolFolder = pane.addFolder({title: 'tool and info'});
+    const toolFolder = pane.addFolder({title: 'tool'});
     const resetButton = toolFolder.addButton({
       title: 'reset',
     });
@@ -371,7 +371,8 @@ export class Renderer {
   export json.
 > press 'i' key
   import json.`;
-    toolFolder.addBinding({info: info}, 'info', {
+    const infoFolder = pane.addFolder({title: 'info', expanded: false});
+    infoFolder.addBinding({info: info}, 'info', {
       readonly: true,
       multiline: true,
       rows: 10,
