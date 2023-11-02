@@ -13,6 +13,8 @@ uniform float toon;
 uniform float toonMin;
 uniform float toonMax;
 uniform vec2 shift; // -0.2 ~ 0.2
+uniform float vignette;
+uniform float vignetteScale;
 uniform vec2 noiseIntensity; // -10.0 ~ 10.0
 uniform vec2 noiseScale; // 1.0 ~ 500.0
 uniform float noiseTime; // 0.0 ~ 1.0
@@ -473,6 +475,9 @@ void main() {
     rgb = bayer8(ivec2(int(modulo.x), int(modulo.y)), rgb);
   }
 
+  // vignette
+  float vig = clamp(vignette - length(texCoord * 2.0 - 1.0) * vignetteScale, 0.0, 1.0);
+
   // final output
-  gl_FragColor = vec4(rgb, 1.0);
+  gl_FragColor = vec4(rgb * vig, 1.0);
 }

@@ -49,6 +49,8 @@ export class Renderer {
   private uToonMax: number;
   private uShift: number[];
   private shiftScale: number;
+  private uVignette: number;
+  private uVignetteScale: number;
   private uNoiseIntensity: number[];
   private uNoiseScale: number[];
   private uNoiseTime: number;
@@ -67,6 +69,7 @@ export class Renderer {
   private isSobel: boolean;
   private isBayer: boolean;
   private isToon: boolean;
+  private isVignette: boolean;
   private gui: any;
 
   constructor(parent: HTMLElement) {
@@ -187,6 +190,15 @@ export class Renderer {
       min: -1.0,
       max: 1.0,
     }).on('change', (v) => { this.uShift[1] = v.value; });
+    const isVignette = filterFolder.addBinding({'vignette': this.isVignette}, 'vignette').on('change', (v) => { this.isVignette = v.value; });
+    const vignette = filterFolder.addBinding({'vignette': this.uVignette}, 'vignette', {
+      min: 0.0,
+      max: 5.0,
+    }).on('change', (v) => { this.uVignette = v.value; });
+    const vignetteScale = filterFolder.addBinding({'v-scale': this.uVignetteScale}, 'v-scale', {
+      min: 0.0,
+      max: 5.0,
+    }).on('change', (v) => { this.uVignetteScale = v.value; });
     const noiseFolder = pane.addFolder({title: 'noise', expanded: false});
     const isNoise = noiseFolder.addBinding({'noise': this.isNoise}, 'noise').on('change', (v) => { this.isNoise = v.value; });
     const noiseIntensityX = noiseFolder.addBinding({'n-ix': this.uNoiseIntensity[0]}, 'n-ix', {
@@ -250,6 +262,8 @@ export class Renderer {
       this.uToonMax = 1.0;
       this.shiftScale = 0.01;
       this.uShift = [0.0, 0.0];
+      this.uVignette = 1.5;
+      this.uVignetteScale = 1.0;
       this.uNoiseIntensity = [0.0, 0.0];
       this.uNoiseScale = [1.0, 1.0];
       this.uNoiseTime = 1.0;
@@ -272,6 +286,8 @@ export class Renderer {
       shiftScale.controller.value.setRawValue(this.shiftScale);
       shiftX.controller.value.setRawValue(this.uShift[0]);
       shiftY.controller.value.setRawValue(this.uShift[1]);
+      vignette.controller.value.setRawValue(this.uVignette);
+      vignetteScale.controller.value.setRawValue(this.uVignetteScale);
       noiseIntensityX.controller.value.setRawValue(this.uNoiseIntensity[0]);
       noiseIntensityY.controller.value.setRawValue(this.uNoiseIntensity[1]);
       noiseScaleX.controller.value.setRawValue(this.uNoiseScale[0]);
@@ -322,6 +338,10 @@ export class Renderer {
         this.shiftScale = Math.random() * 0.2;
         this.uShift = [Math.random() * 2.0 - 1.0, Math.random() * 2.0 - 1.0];
       }
+      if (this.isVignette === true) {
+        this.uVignette = Math.random() * 5.0;
+        this.uVignetteScale = Math.random() * 5.0;
+      }
       if (this.isNoise === true) {
         this.uNoiseIntensity = [Math.random() * 20.0 - 10.0, Math.random() * 20.0 - 10.0];
         this.uNoiseScale = [Math.random() * 499.0 + 1.0, Math.random() * 499.0 + 1.0];
@@ -351,6 +371,8 @@ export class Renderer {
       shiftScale.controller.value.setRawValue(this.shiftScale);
       shiftX.controller.value.setRawValue(this.uShift[0]);
       shiftY.controller.value.setRawValue(this.uShift[1]);
+      vignette.controller.value.setRawValue(this.uVignette);
+      vignetteScale.controller.value.setRawValue(this.uVignetteScale);
       noiseIntensityX.controller.value.setRawValue(this.uNoiseIntensity[0]);
       noiseIntensityY.controller.value.setRawValue(this.uNoiseIntensity[1]);
       noiseScaleX.controller.value.setRawValue(this.uNoiseScale[0]);
@@ -394,6 +416,8 @@ export class Renderer {
       uToonMax: toonMax,
       shiftScale: shiftScale,
       uShift: [shiftX, shiftY],
+      uVignette: vignette,
+      uVignetteScale: vignetteScale,
       uNoiseIntensity: [noiseIntensityX, noiseIntensityY],
       uNoiseScale: [noiseScaleX, noiseScaleY],
       uNoiseTime: noiseTime,
@@ -411,6 +435,7 @@ export class Renderer {
       isSobel: isSobel,
       isBayer: isBayer,
       isToon: isToon,
+      isVignette: isVignette,
     };
   }
   init(): void {
@@ -504,6 +529,8 @@ export class Renderer {
         'toonMin',
         'toonMax',
         'shift',
+        'vignette',
+        'vignetteScale',
         'noiseIntensity',
         'noiseScale',
         'noiseTime',
@@ -530,6 +557,8 @@ export class Renderer {
         'uniform1f',
         'uniform1f',
         'uniform2fv',
+        'uniform1f',
+        'uniform1f',
         'uniform2fv',
         'uniform2fv',
         'uniform1f',
@@ -559,6 +588,8 @@ export class Renderer {
     this.uToonMax = 1.0;
     this.shiftScale = 0.01;
     this.uShift = [0.0, 0.0];
+    this.uVignette = 1.5;
+    this.uVignetteScale = 1.0;
     this.uNoiseIntensity = [0.0, 0.0];
     this.uNoiseScale = [1.0, 1.0];
     this.uNoiseTime = 1.0;
@@ -576,6 +607,7 @@ export class Renderer {
     this.isSobel = false;
     this.isBayer = false;
     this.isToon = false;
+    this.isVignette = false;
   }
   update(): void {
     if (this.gl == null || this.image == null) {return;}
@@ -618,6 +650,8 @@ export class Renderer {
       this.uToonMin,
       this.uToonMax,
       this.isShift ? [this.uShift[0] * this.shiftScale, this.uShift[1] * this.shiftScale] : [0.0, 0.0],
+      this.uVignette,
+      this.isVignette ? this.uVignetteScale : 0.0,
       this.isNoise ? this.uNoiseIntensity : [0.0, 0.0],
       this.isNoise ? this.uNoiseScale : [1.0, 1.0],
       this.uNoiseTime,
@@ -683,6 +717,8 @@ export class Renderer {
             if (json.uToonMax != null) {this.uToonMax = json.uToonMax;}
             if (json.shiftScale != null) {this.shiftScale = json.shiftScale;}
             if (json.uShift != null) {this.uShift = json.uShift;}
+            if (json.uVignette != null) {this.uVignette = json.uVignette;}
+            if (json.uVignetteScale != null) {this.uVignetteScale = json.uVignetteScale;}
             if (json.uNoiseIntensity != null) {this.uNoiseIntensity = json.uNoiseIntensity;}
             if (json.uNoiseScale != null) {this.uNoiseScale = json.uNoiseScale;}
             if (json.uNoiseTime != null) {this.uNoiseTime = json.uNoiseTime;}
@@ -700,6 +736,7 @@ export class Renderer {
             if (json.isSobel != null) {this.isSobel = json.isSobel;}
             if (json.isBayer != null) {this.isBayer = json.isBayer;}
             if (json.isToon != null) {this.isToon = json.isToon;}
+            if (json.isVignette != null) {this.isVignette = json.isVignette;}
 
             this.gui.uCrevice[0].controller.value.setRawValue(this.uCrevice[0]);
             this.gui.uCrevice[1].controller.value.setRawValue(this.uCrevice[1]);
@@ -718,6 +755,8 @@ export class Renderer {
             this.gui.shiftScale.controller.value.setRawValue(this.shiftScale);
             this.gui.uShift[0].controller.value.setRawValue(this.uShift[0]);
             this.gui.uShift[1].controller.value.setRawValue(this.uShift[1]);
+            this.gui.uVignette.controller.value.setRawValue(this.uVignette);
+            this.gui.uVignetteScale.controller.value.setRawValue(this.uVignetteScale);
             this.gui.uNoiseIntensity[0].controller.value.setRawValue(this.uNoiseIntensity[0]);
             this.gui.uNoiseIntensity[1].controller.value.setRawValue(this.uNoiseIntensity[1]);
             this.gui.uNoiseScale[0].controller.value.setRawValue(this.uNoiseScale[0]);
@@ -739,6 +778,7 @@ export class Renderer {
             this.gui.isSobel.controller.value.setRawValue(this.isSobel);
             this.gui.isBayer.controller.value.setRawValue(this.isBayer);
             this.gui.isToon.controller.value.setRawValue(this.isToon);
+            this.gui.isVignette.controller.value.setRawValue(this.isVignette);
           });
           break
         case 'j':
@@ -757,6 +797,8 @@ export class Renderer {
             uToonMin: this.uToonMin,
             shiftScale: this.shiftScale,
             uShift: this.uShift,
+            uVignette: this.uVignette,
+            uVignetteScale: this.uVignetteScale,
             uNoiseIntensity: this.uNoiseIntensity,
             uNoiseScale: this.uNoiseScale,
             uNoiseTime: this.uNoiseTime,
@@ -774,6 +816,7 @@ export class Renderer {
             isSobel: this.isSobel,
             isBayer: this.isBayer,
             isToon: this.isToon,
+            isVignette: this.isVignette,
           };
           Renderer.downloadJson(parameters);
           break;
