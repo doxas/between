@@ -9,6 +9,7 @@ export class Renderer {
   private parent: HTMLElement;
   private canvas: HTMLCanvasElement;
   private context: CanvasRenderingContext2D;
+  private console: HTMLElement;
   private image: HTMLImageElement | HTMLCanvasElement;
   private imageName: string;
   private imageWidth: number;
@@ -74,6 +75,7 @@ export class Renderer {
     this.context = this.canvas.getContext('2d');
     this.glCanvas = document.createElement('canvas');
     this.gl = this.glCanvas.getContext('webgl', {preserveDrawingBuffer: true});
+    this.console = document.querySelector('#console');
 
     this.canvas.style.width = '100%';
     this.canvas.style.height = '100%';
@@ -842,6 +844,8 @@ export class Renderer {
       const y = pointerEvent.pageY / window.innerHeight * 2.0 - 1.0;
       this.uMouse[0] = x;
       this.uMouse[1] = -y;
+      this.console.textContent = `x: ${x}
+y: ${-y}`;
     }, false);
   }
   resize(): void {

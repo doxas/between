@@ -10,3 +10,12 @@ html, body {
   height: 100%;
   overflow: hidden;
 }
+
+#console {
+  font-family: consolas, Monaco, monospace;
+  font-size: x-small;
+  padding: 10px;
+  position: fixed;
+  top: 0px;
+  left: 0px;
+}
