@@ -3,18 +3,18 @@ uniform vec2 resolution;
 uniform float resourceAspect;
 uniform sampler2D inputTexture;
 uniform vec3 hsv;
-uniform float sobel;
+uniform float sobel; // -2.0 ~ 2.0
 uniform float temperature; // -1.67 ~ 1.67
 uniform float tint; // -1.67 ~ 1.67
 uniform float contrastIntensity; // 0.0 ~ 1.0
 uniform float mosaic; // 1.0 ~ 400.0
 uniform float bayer; // 1.0 ~ 400.0
-uniform float toon;
-uniform float toonMin;
-uniform float toonMax;
+uniform float toon; // 2 ~ 10
+uniform float toonMin; // 0.0 ~ 1.0
+uniform float toonMax; // 0.0 ~ 1.0
 uniform vec2 shift; // -0.2 ~ 0.2
-uniform float vignette;
-uniform float vignetteScale;
+uniform float vignette; // 0.0 ~ 5.0
+uniform float vignetteScale; // 0.0 ~ 5.0
 uniform vec2 noiseIntensity; // -10.0 ~ 10.0
 uniform vec2 noiseScale; // 1.0 ~ 500.0
 uniform float noiseTime; // 0.0 ~ 1.0
