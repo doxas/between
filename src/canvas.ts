@@ -243,6 +243,21 @@ export class Renderer {
       max: 10.0,
     }).on('change', (v) => { this.uSNoiseTime = v.value; });
     const toolFolder = pane.addFolder({title: 'tool'});
+    const openButton = toolFolder.addButton({
+      title: 'open',
+    });
+    openButton.on('click', () => {
+      const input = document.createElement('input');
+      input.setAttribute('type', 'file');
+      input.addEventListener('change', async () => {
+        if (input.files.length === 0) {
+          return;
+        }
+        await this.fromFile(input.files[0]);
+        this.update();
+      });
+      input.click();
+    });
     const resetButton = toolFolder.addButton({
       title: 'reset',
     });
@@ -690,6 +705,55 @@ export class Renderer {
       this.uCanvasAspect = window.innerWidth / window.innerHeight;
     }
   }
+  fromFile(file: File): Promise<HTMLImageElement | HTMLCanvasElement> {
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.addEventListener('load', () => {
+        const url = reader.result as string;
+        this.image = new Image();
+        this.image.addEventListener('load', () => {
+          const img = this.image as HTMLImageElement;
+          this.imageWidth = img.naturalWidth;
+          this.imageHeight = img.naturalHeight;
+          this.uResourceAspect = img.naturalWidth / img.naturalHeight;
+          if (Renderer.isPower(img.naturalWidth) !== true || Renderer.isPower(img.naturalHeight) !== true) {
+            const c = document.createElement('canvas');
+            const cx = c.getContext('2d');
+            const nw = img.naturalWidth;
+            const nh = img.naturalHeight;
+            let width = 0;
+            let height = 0;
+            let counter = 0;
+            while(true) {
+              ++counter;
+              const v = Math.pow(2, counter);
+              if (width === 0) {
+                if (nw < v) {
+                  width = v;
+                }
+              }
+              if (height === 0) {
+                if (nh < v) {
+                  height = v;
+                }
+              }
+              if (width !== 0 && height !== 0) {
+                break;
+              }
+            }
+            c.width = width;
+            c.height = height;
+            cx.drawImage(this.image, 0, 0, width, height);
+            this.image = c;
+          }
+          resolve(this.image);
+        }, false);
+        this.image.src = url;
+      }, false);
+      this.imageName = file.name;
+      reader.readAsDataURL(file);
+    });
+  }
   eventSetting(): void {
     window.addEventListener('resize', this.resize, false);
     window.addEventListener('keydown', (keyboardEvent) => {
@@ -828,57 +892,14 @@ export class Renderer {
     body.addEventListener('dragover', (evt) => {
       evt.preventDefault();
     }, false);
-    body.addEventListener('drop', (evt) => {
+    body.addEventListener('drop', async (evt) => {
       evt.preventDefault();
       const files = evt.dataTransfer.files;
       if (files.length === 0) {
         return;
       }
-      const reader = new FileReader();
-      reader.addEventListener('load', () => {
-        const url = reader.result as string;
-        this.image = new Image();
-        this.image.addEventListener('load', () => {
-          const img = this.image as HTMLImageElement;
-          this.imageWidth = img.naturalWidth;
-          this.imageHeight = img.naturalHeight;
-          this.uResourceAspect = img.naturalWidth / img.naturalHeight;
-          if (Renderer.isPower(img.naturalWidth) !== true || Renderer.isPower(img.naturalHeight) !== true) {
-            const c = document.createElement('canvas');
-            const cx = c.getContext('2d');
-            const nw = img.naturalWidth;
-            const nh = img.naturalHeight;
-            let width = 0;
-            let height = 0;
-            let counter = 0;
-            while(true) {
-              ++counter;
-              const v = Math.pow(2, counter);
-              if (width === 0) {
-                if (nw < v) {
-                  width = v;
-                }
-              }
-              if (height === 0) {
-                if (nh < v) {
-                  height = v;
-                }
-              }
-              if (width !== 0 && height !== 0) {
-                break;
-              }
-            }
-            c.width = width;
-            c.height = height;
-            cx.drawImage(this.image, 0, 0, width, height);
-            this.image = c;
-          }
-          this.update();
-        }, false);
-        this.image.src = url;
-      }, false);
-      this.imageName = files[0].name;
-      reader.readAsDataURL(files[0]);
+      await this.fromFile(files[0]);
+      this.update();
     }, false);
 
     this.canvas.addEventListener('pointermove', (pointerEvent) => {
