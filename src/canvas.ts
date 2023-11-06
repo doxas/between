@@ -108,31 +108,31 @@ export class Renderer {
     const generalFolder = pane.addFolder({title: 'general'});
     const creviceX = generalFolder.addBinding({'crevice-x': this.uCrevice[0]}, 'crevice-x', {
       min: 0,
-      max: 1.0,
+      max: 0.5,
     }).on('change', (v) => { this.uCrevice[0] = v.value; });
     const creviceY = generalFolder.addBinding({'crevice-y': this.uCrevice[1]}, 'crevice-y', {
       min: 0,
-      max: 1.0,
+      max: 0.5,
     }).on('change', (v) => { this.uCrevice[1] = v.value; });
     const vertexScale = generalFolder.addBinding({'scale': this.uVertexScale}, 'scale', {
       min: 1.0,
-      max: 4.0,
+      max: 5.0,
     }).on('change', (v) => { this.uVertexScale = v.value; });
     const colorFolder = pane.addFolder({title: 'color'});
     const isTemperature = colorFolder.addBinding({'temperature': this.isTemperature}, 'temperature').on('change', (v) => { this.isTemperature = v.value; });
     const temperature = colorFolder.addBinding({'temperature': this.uTemperature}, 'temperature', {
-      min: -1.67,
-      max: 1.67,
+      min: -3.0,
+      max: 3.0,
     }).on('change', (v) => { this.uTemperature = v.value; });
     const isTint = colorFolder.addBinding({'tint': this.isTint}, 'tint').on('change', (v) => { this.isTint = v.value; });
     const tint = colorFolder.addBinding({'tint': this.uTint}, 'tint', {
-      min: -1.67,
-      max: 1.67,
+      min: -3.0,
+      max: 3.0,
     }).on('change', (v) => { this.uTint = v.value; });
     const isContrast = colorFolder.addBinding({'contrast': this.isContrast}, 'contrast').on('change', (v) => { this.isContrast = v.value; });
     const contrast = colorFolder.addBinding({'contrast': this.uContrast}, 'contrast', {
       min: 0.0,
-      max: 2.0,
+      max: 3.0,
     }).on('change', (v) => { this.uContrast = v.value; });
     const isHSV = colorFolder.addBinding({'hsv': this.isHSV}, 'hsv').on('change', (v) => { this.isHSV = v.value; });
     const HSVH = colorFolder.addBinding({'hsv-H': this.uHSV[0]}, 'hsv-H', {
@@ -150,8 +150,8 @@ export class Renderer {
     const filterFolder = pane.addFolder({title: 'filter'});
     const isSobel = filterFolder.addBinding({'sobel': this.isSobel}, 'sobel').on('change', (v) => { this.isSobel = v.value; });
     const sobel = filterFolder.addBinding({'sobel': this.uSobel}, 'sobel', {
-      min: -2.0,
-      max: 2.0,
+      min: -3.0,
+      max: 3.0,
     }).on('change', (v) => { this.uSobel = v.value; });
     const isToon = filterFolder.addBinding({'toon': this.isToon}, 'toon').on('change', (v) => { this.isToon = v.value; });
     const toon = filterFolder.addBinding({'toon': this.uToon}, 'toon', {
@@ -193,11 +193,11 @@ export class Renderer {
     const isVignette = filterFolder.addBinding({'vignette': this.isVignette}, 'vignette').on('change', (v) => { this.isVignette = v.value; });
     const vignette = filterFolder.addBinding({'vignette': this.uVignette}, 'vignette', {
       min: 0.0,
-      max: 5.0,
+      max: 4.0,
     }).on('change', (v) => { this.uVignette = v.value; });
     const vignetteScale = filterFolder.addBinding({'v-scale': this.uVignetteScale}, 'v-scale', {
       min: 0.0,
-      max: 5.0,
+      max: 4.0,
     }).on('change', (v) => { this.uVignetteScale = v.value; });
     const noiseFolder = pane.addFolder({title: 'noise', expanded: false});
     const isNoise = noiseFolder.addBinding({'noise': this.isNoise}, 'noise').on('change', (v) => { this.isNoise = v.value; });
@@ -354,8 +354,8 @@ export class Renderer {
         this.uShift = [Math.random() * 2.0 - 1.0, Math.random() * 2.0 - 1.0];
       }
       if (this.isVignette === true) {
-        this.uVignette = Math.random() * 5.0;
-        this.uVignetteScale = Math.random() * 5.0;
+        this.uVignette = Math.random() * 4.0;
+        this.uVignetteScale = Math.random() * 4.0;
       }
       if (this.isNoise === true) {
         this.uNoiseIntensity = [Math.random() * 20.0 - 10.0, Math.random() * 20.0 - 10.0];
