@@ -491,6 +491,10 @@ void main() {
     rgb = vec3(toonMin) + floored * clampRange;
   }
 
+  // vignette
+  float vig = clamp(vignette - length(texCoord * 2.0 - 1.0) * vignetteScale, 0.0, 1.0);
+  rgb *= vig;
+
   // bayer
   if (bayer > 0.0) {
     vec2 floorCoord = floor(aspected * bayer + 0.5);
@@ -498,9 +502,6 @@ void main() {
     rgb = bayer8(ivec2(int(modulo.x), int(modulo.y)), rgb);
   }
 
-  // vignette
-  float vig = clamp(vignette - length(texCoord * 2.0 - 1.0) * vignetteScale, 0.0, 1.0);
-
   // final output
-  gl_FragColor = vec4(rgb * vig, 1.0);
+  gl_FragColor = vec4(rgb, 1.0);
 }

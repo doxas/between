@@ -167,7 +167,7 @@ export class Renderer {
       min: -1.0,
       max: 1.0,
     }).on('change', (v) => { this.uHSV[2] = v.value; });
-    const filterFolder = pane.addFolder({title: 'filter', expanded: false});
+    const filterFolder = pane.addFolder({title: 'filter'});
     const isSobel = filterFolder.addBinding({'sobel': this.isSobel}, 'sobel').on('change', (v) => { this.isSobel = v.value; });
     const sobel = filterFolder.addBinding({'sobel': this.uSobel}, 'sobel', {
       min: -3.0,
