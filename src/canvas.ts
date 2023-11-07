@@ -167,7 +167,7 @@ export class Renderer {
       min: -1.0,
       max: 1.0,
     }).on('change', (v) => { this.uHSV[2] = v.value; });
-    const filterFolder = pane.addFolder({title: 'filter'});
+    const filterFolder = pane.addFolder({title: 'filter', expanded: false});
     const isSobel = filterFolder.addBinding({'sobel': this.isSobel}, 'sobel').on('change', (v) => { this.isSobel = v.value; });
     const sobel = filterFolder.addBinding({'sobel': this.uSobel}, 'sobel', {
       min: -3.0,
@@ -430,7 +430,7 @@ export class Renderer {
   export json.
 > press 'i' key
   import json.`;
-    const infoFolder = pane.addFolder({title: 'info', expanded: false});
+    const infoFolder = pane.addFolder({title: 'info'});
     infoFolder.addBinding({info: info}, 'info', {
       readonly: true,
       multiline: true,
