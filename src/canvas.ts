@@ -119,7 +119,7 @@ export class Renderer {
       max: 0.5,
     }).on('change', (v) => { this.uCrevice[1] = v.value; });
     const dropScale = generalFolder.addBinding({'drop-scl': this.uDropScale}, 'drop-scl', {
-      min: 0.1,
+      min: 0.0,
       max: 2.0,
     }).on('change', (v) => { this.uDropScale = v.value; });
     const dropAttenuation = generalFolder.addBinding({'drop-att': this.uDropAttenuation}, 'drop-att', {
