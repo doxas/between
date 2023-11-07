@@ -37,6 +37,10 @@ export class Renderer {
   private uCanvasAspect: number;
   private uResourceAspect: number;
   private uVertexScale: number;
+  private uDropScale: number;
+  private uDropAttenuation: number;
+  private uDropRange: number;
+  private uDropDistortion: number;
   private uTemperature: number;
   private uTint: number;
   private uContrast: number;
@@ -114,6 +118,22 @@ export class Renderer {
       min: 0,
       max: 0.5,
     }).on('change', (v) => { this.uCrevice[1] = v.value; });
+    const dropScale = generalFolder.addBinding({'drop-scl': this.uDropScale}, 'drop-scl', {
+      min: 0.1,
+      max: 2.0,
+    }).on('change', (v) => { this.uDropScale = v.value; });
+    const dropAttenuation = generalFolder.addBinding({'drop-att': this.uDropAttenuation}, 'drop-att', {
+      min: 1.0,
+      max: 10.0,
+    }).on('change', (v) => { this.uDropAttenuation = v.value; });
+    const dropRange = generalFolder.addBinding({'drop-rng': this.uDropRange}, 'drop-rng', {
+      min: 0.0,
+      max: 0.99,
+    }).on('change', (v) => { this.uDropRange = v.value; });
+    const dropDistortion = generalFolder.addBinding({'drop-dst': this.uDropDistortion}, 'drop-dst', {
+      min: 1.0,
+      max: 10.0,
+    }).on('change', (v) => { this.uDropDistortion = v.value; });
     const vertexScale = generalFolder.addBinding({'scale': this.uVertexScale}, 'scale', {
       min: 1.0,
       max: 5.0,
@@ -418,8 +438,6 @@ export class Renderer {
     });
 
     this.gui = {
-      uCrevice: [creviceX, creviceY],
-      uTemperature: temperature,
       uTint: tint,
       uContrast: contrast,
       uHSV: [HSVH, HSVS, HSVV],
@@ -533,6 +551,10 @@ export class Renderer {
         'resourceAspect',
         'vertexScale',
         'inputTexture',
+        'dropScale',
+        'dropAttenuation',
+        'dropRange',
+        'dropDistortion',
         'hsv',
         'sobel',
         'temperature',
@@ -561,6 +583,10 @@ export class Renderer {
         'uniform1f',
         'uniform1f',
         'uniform1i',
+        'uniform1f',
+        'uniform1f',
+        'uniform1f',
+        'uniform1f',
         'uniform3fv',
         'uniform1f',
         'uniform1f',
@@ -590,6 +616,10 @@ export class Renderer {
 
     this.uCrevice = [0, 0];
     this.uMouse = [0.0, 0.0];
+    this.uDropScale = 0.0;
+    this.uDropAttenuation = 5.0;
+    this.uDropRange = 0.5;
+    this.uDropDistortion = 1.0;
     this.uVertexScale = 1.25;
     this.uTemperature = 0.0;
     this.uTint = 0.0;
@@ -654,6 +684,10 @@ export class Renderer {
       this.uResourceAspect,
       this.uVertexScale,
       0,
+      this.uDropScale,
+      this.uDropAttenuation,
+      this.uDropRange,
+      this.uDropDistortion,
       this.isHSV ? this.uHSV : [0.0, 0.0, 0.0],
       this.isSobel ? this.uSobel : 0.0,
       this.isTemperature ? this.uTemperature : 0.0,
@@ -767,8 +801,6 @@ export class Renderer {
         case 'i':
           Renderer.importJson().then((json) => {
             // TODO: validate value and type
-            if (json.uCrevice != null) {this.uCrevice = json.uCrevice;}
-            if (json.uMouse != null) {this.uMouse = json.uMouse;}
             if (json.uTemperature != null) {this.uTemperature = json.uTemperature;}
             if (json.uTint != null) {this.uTint = json.uTint;}
             if (json.uContrast != null) {this.uContrast = json.uContrast;}
@@ -802,8 +834,6 @@ export class Renderer {
             if (json.isToon != null) {this.isToon = json.isToon;}
             if (json.isVignette != null) {this.isVignette = json.isVignette;}
 
-            this.gui.uCrevice[0].controller.value.setRawValue(this.uCrevice[0]);
-            this.gui.uCrevice[1].controller.value.setRawValue(this.uCrevice[1]);
             this.gui.uTemperature.controller.value.setRawValue(this.uTemperature);
             this.gui.uTint.controller.value.setRawValue(this.uTint);
             this.gui.uContrast.controller.value.setRawValue(this.uContrast);
@@ -847,8 +877,6 @@ export class Renderer {
           break
         case 'j':
           const parameters = {
-            uCrevice: this.uCrevice,
-            uMouse: this.uMouse,
             uTemperature: this.uTemperature,
             uTint: this.uTint,
             uContrast: this.uContrast,
