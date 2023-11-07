@@ -438,6 +438,7 @@ export class Renderer {
     });
 
     this.gui = {
+      uTemperature: temperature,
       uTint: tint,
       uContrast: contrast,
       uHSV: [HSVH, HSVS, HSVV],
