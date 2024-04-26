@@ -398,6 +398,65 @@ export class ShaderProgram {
       }
     });
   }
+}
 
+export class UniformStore {
+  private data: any;
+  constructor() {
+    this.data = {
+      uTemperature: 0.0,
+      uTint: 0.0,
+      uContrast: 0.5,
+      uHSV: [0.0, 0.0, 0.0],
+      uSobel: 0.0,
+      uMosaic: 200.0,
+      uBayer: 200.0,
+      uToon: 3.0,
+      uToonMin: 0.0,
+      uToonMax: 1.0,
+      shiftScale: 0.01,
+      uShift: [0.0, 0.0],
+      uVignette: 1.5,
+      uVignetteScale: 1.0,
+      uNoiseIntensity: [0.0, 0.0],
+      uNoiseScale: [1.0, 1.0],
+      uNoiseTime: 1.0,
+      uSNoiseIntensity: [0.0, 0.0],
+      uSNoiseScale: [1.0, 1.0],
+      uSNoiseTime: 0.0,
+      isTemperature: true,
+      isTint: true,
+      isContrast: true,
+      isHSV: true,
+      isMosaic: false,
+      isShift: false,
+      isNoise: false,
+      isSNoise: false,
+      isSobel: false,
+      isBayer: false,
+      isToon: false,
+      isVignette: false,
+    };
+  }
+  set(key: string, value?: any): Map<string, any> {
+    if (value != null) {
+      this.data[key] = value;
+    } else if(Object.prototype.toString.call(key) === '[object Object]') {
+      Object.entries(key).forEach(([k, v]) => {
+        if (this.data[k] == null) {
+          console.warn(`UniformStore: invalid key "${k}"`);
+        }
+        this.data[k] = v;
+      });
+    }
+    return this.data;
+  }
+  get(key?: string): any {
+    if (key == null) {
+      return Object.assign({}, this.data);
+    } else {
+      return this.data[key];
+    }
+  }
 }
 
