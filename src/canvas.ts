@@ -786,8 +786,7 @@ export class Renderer {
       this.exShaderProgram.use();
       this.exShaderProgram.setAttribute(this.vbo, this.ibo);
       this.renderByUniformStore(this.exShaderProgram, this.uniformStore[0]);
-      // this.renderByUniformStore(this.exShaderProgram, this.uniformStore[1]);
-      // gl.drawElements(gl.TRIANGLES, this.indices.length, gl.UNSIGNED_SHORT, 0);
+      this.renderByUniformStore(this.exShaderProgram, this.uniformStore[1]);
 
       this.exportFunction();
       this.exportFunction = null;
@@ -798,8 +797,7 @@ export class Renderer {
       this.shaderProgram.use();
       this.shaderProgram.setAttribute(this.vbo, this.ibo);
       this.renderByUniformStore(this.shaderProgram, this.uniformStore[0]);
-      // this.renderByUniformStore(this.shaderProgram, this.uniformStore[1]);
-      // gl.drawElements(gl.TRIANGLES, this.indices.length, gl.UNSIGNED_SHORT, 0);
+      this.renderByUniformStore(this.shaderProgram, this.uniformStore[1]);
     }
   }
   renderByUniformStore(program: ShaderProgram, uniform: UniformStore): void {
