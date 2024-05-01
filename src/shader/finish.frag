@@ -12,24 +12,26 @@ void main() {
   if (blend == 0) {
     outColor = secondColor;
   } else if (blend == 1) {
-    outColor = firstColor + secondColor;
+    outColor = firstColor;
   } else if (blend == 2) {
-    outColor = firstColor - secondColor;
+    outColor = firstColor + secondColor;
   } else if (blend == 3) {
-    outColor = secondColor - firstColor;
+    outColor = firstColor - secondColor;
   } else if (blend == 4) {
-    outColor = firstColor * secondColor;
+    outColor = secondColor - firstColor;
   } else if (blend == 5) {
+    outColor = firstColor * secondColor;
+  } else if (blend == 6) {
     vec3 one = (1.0 - firstColor);
     vec3 two = (1.0 - secondColor);
     outColor = 1.0 - one * two;
-  } else if (blend == 6) {
-    outColor = min(firstColor, secondColor);
   } else if (blend == 7) {
-    outColor = max(firstColor, secondColor);
+    outColor = min(firstColor, secondColor);
   } else if (blend == 8) {
-    outColor = abs(firstColor - secondColor);
+    outColor = max(firstColor, secondColor);
   } else if (blend == 9) {
+    outColor = abs(firstColor - secondColor);
+  } else if (blend == 10) {
     outColor = (firstColor + secondColor) - 2.0 * firstColor * secondColor;
   }
 

@@ -84,15 +84,16 @@ export class Renderer {
 
   static BLEND_MODE = {
     NONE: 0,
-    ADD: 1,
-    SUBTRACT: 2,
-    INVERT_SUBTRACT: 3,
-    MULTIPLY: 4,
-    SCREEN: 5,
-    DARKEN: 6,
-    LIGHTEN: 7,
-    DIFFERENCE: 8,
-    EXCLUSION: 9,
+    UNDER: 1,
+    ADD: 2,
+    SUBTRACT: 3,
+    INVERT_SUBTRACT: 4,
+    MULTIPLY: 5,
+    SCREEN: 6,
+    DARKEN: 7,
+    LIGHTEN: 8,
+    DIFFERENCE: 9,
+    EXCLUSION: 10,
   };
 
   constructor(parent: HTMLElement) {
