@@ -79,7 +79,19 @@ export class Renderer {
   private isBayer: boolean;
   private isToon: boolean;
   private isVignette: boolean;
+  private bufferBlendMode: number;
   private gui: any;
+
+  static BLEND_MODE = {
+    NONE: 0,
+    ADD: 1,
+    SUBTRACT: 2,
+    INVERT_SUBTRACT: 3,
+    MULTIPLY: 4,
+    SCREEN: 5,
+    DARKEN: 6,
+    LIGHTEN: 7,
+  };
 
   constructor(parent: HTMLElement) {
     this.parent = parent;
@@ -139,6 +151,9 @@ export class Renderer {
       this.uniformStoreIndex = +v.value;
       this.updateParameter(this.uniformStore[this.uniformStoreIndex].get());
       this.updatePane();
+    });
+    generalFolder.addBinding({mode: this.bufferBlendMode}, 'mode', {options: Renderer.BLEND_MODE}).on('change', (v) => {
+      this.bufferBlendMode = +v.value;
     });
     const colorFolder = pane.addFolder({title: 'color'});
     const isTemperature = colorFolder.addBinding({'temperature': this.isTemperature}, 'temperature').on('change', (v) => { setter('isTemperature', v.value); });
@@ -214,7 +229,7 @@ export class Renderer {
     const isShift = filterFolder.addBinding({'shift': this.isShift}, 'shift').on('change', (v) => { setter('isShift', v.value); });
     const shiftScale = filterFolder.addBinding({'shift-s': this.shiftScale}, 'shift-s', {
       min: 0.0,
-      max: 0.2,
+      max: 0.1,
     }).on('change', (v) => { setter('shiftScale', v.value); });
     const shiftX = filterFolder.addBinding({'shift-x': this.uShift[0]}, 'shift-x', {
       min: -1.0,
@@ -244,16 +259,16 @@ export class Renderer {
     const noiseFolder = pane.addFolder({title: 'noise', expanded: false});
     const isNoise = noiseFolder.addBinding({'noise': this.isNoise}, 'noise').on('change', (v) => { setter('isNoise', v.value); });
     const noiseIntensityX = noiseFolder.addBinding({'n-ix': this.uNoiseIntensity[0]}, 'n-ix', {
-      min: -10.0,
-      max: 10.0,
+      min: -1.0,
+      max: 1.0,
     }).on('change', (v) => {
       const store = this.uniformStore[this.uniformStoreIndex];
       const data = store.get('uNoiseIntensity');
       store.set('uNoiseIntensity', [v.value, data[1]]);
     });
     const noiseIntensityY = noiseFolder.addBinding({'n-iy': this.uNoiseIntensity[1]}, 'n-iy', {
-      min: -10.0,
-      max: 10.0,
+      min: -1.0,
+      max: 1.0,
     }).on('change', (v) => {
       const store = this.uniformStore[this.uniformStoreIndex];
       const data = store.get('uNoiseIntensity');
@@ -660,6 +675,7 @@ export class Renderer {
         'canvasAspect',
         'resourceAspect',
         'vertexScale',
+        'blend',
         'firstTexture',
         'secondTexture',
       ],
@@ -669,6 +685,7 @@ export class Renderer {
         'uniform1f',
         'uniform1f',
         'uniform1f',
+        'uniform1i',
         'uniform1i',
         'uniform1i',
       ],
@@ -690,12 +707,14 @@ export class Renderer {
       uniform: [
         'crevice',
         'mouse',
+        'blend',
         'firstTexture',
         'secondTexture',
       ],
       type: [
         'uniform2fv',
         'uniform2fv',
+        'uniform1i',
         'uniform1i',
         'uniform1i',
       ],
@@ -777,6 +796,8 @@ export class Renderer {
     this.uMouse = [0.0, 0.0];
     this.uVertexScale = 1.25;
 
+    this.bufferBlendMode = Renderer.BLEND_MODE.NONE;
+
     gl.clearColor(0.5, 0.5, 0.5, 1.0);
   }
   updateTexture(): void {
@@ -844,6 +865,7 @@ export class Renderer {
       const uniforms = [
         this.uCrevice,
         this.uMouse,
+        this.bufferBlendMode,
         0,
         1,
       ];
@@ -867,6 +889,7 @@ export class Renderer {
         this.uCanvasAspect,
         this.uResourceAspect,
         this.uVertexScale,
+        this.bufferBlendMode,
         0,
         1,
       ];
