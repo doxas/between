@@ -1,6 +1,8 @@
 import { Pane } from 'tweakpane';
 import { ShaderProgram, UniformStore, WebGLUtility } from './webgl';
 
+import * as finishVertexShaderSource from './shader/finish.vert';
+import * as finishFragmentShaderSource from './shader/finish.frag';
 import * as vertexShaderSource from './shader/main.vert';
 import * as fragmentShaderSource from './shader/main.frag';
 import * as exportVertexShaderSource from './shader/export.vert';
@@ -18,8 +20,11 @@ export class Renderer {
   private gl: WebGLRenderingContext;
   private isRendering: boolean;
   private texture: WebGLTexture;
+  private finishVertexShaderSource: string;
+  private finishFragmentShaderSource: string;
   private vertexShaderSource: string;
   private fragmentShaderSource: string;
+  private finishShaderProgram: ShaderProgram;
   private shaderProgram: ShaderProgram;
   private exVertexShaderSource: string;
   private exShaderProgram: ShaderProgram;
@@ -27,10 +32,12 @@ export class Renderer {
   private texCoord: number[];
   private offset: number[];
   private indices: number[];
+  private finishVbo: WebGLBuffer[];
   private vbo: WebGLBuffer[];
   private ibo: WebGLBuffer;
   private uniformStore: UniformStore[];
   private uniformStoreIndex: number;
+  private framebuffers: any[];
 
   private exportFunction: () => void | null;
 
@@ -637,20 +644,26 @@ export class Renderer {
         ++iI;
       }
     }
-    this.vbo = [
+    this.finishVbo = [
       WebGLUtility.createVbo(gl, this.position),
       WebGLUtility.createVbo(gl, this.texCoord),
       WebGLUtility.createVbo(gl, this.offset),
     ];
+    this.vbo = [
+      WebGLUtility.createVbo(gl, this.position),
+      WebGLUtility.createVbo(gl, this.texCoord),
+    ];
     this.ibo = WebGLUtility.createIbo(gl, this.indices);
 
+    this.finishVertexShaderSource = finishVertexShaderSource.default;
+    this.finishFragmentShaderSource = finishFragmentShaderSource.default;
     this.vertexShaderSource = vertexShaderSource.default;
     this.fragmentShaderSource = fragmentShaderSource.default;
     this.exVertexShaderSource = exportVertexShaderSource.default;
 
-    const option = {
-      vertexShaderSource: this.vertexShaderSource,
-      fragmentShaderSource: this.fragmentShaderSource,
+    const finishOption = {
+      vertexShaderSource: this.finishVertexShaderSource,
+      fragmentShaderSource: this.finishFragmentShaderSource,
       attribute: [
         'position',
         'texCoord',
@@ -662,12 +675,44 @@ export class Renderer {
         2,
       ],
       uniform: [
-        'resolution',
         'crevice',
         'mouse',
         'canvasAspect',
         'resourceAspect',
         'vertexScale',
+        'firstTexture',
+        'secondTexture',
+      ],
+      type: [
+        'uniform2fv',
+        'uniform2fv',
+        'uniform1f',
+        'uniform1f',
+        'uniform1f',
+        'uniform1i',
+        'uniform1i',
+      ],
+    };
+    this.finishShaderProgram = new ShaderProgram(gl, finishOption);
+    finishOption.vertexShaderSource = this.exVertexShaderSource;
+    this.exShaderProgram = new ShaderProgram(gl, finishOption);
+
+    const option = {
+      vertexShaderSource: this.vertexShaderSource,
+      fragmentShaderSource: this.fragmentShaderSource,
+      attribute: [
+        'position',
+        'texCoord',
+      ],
+      stride: [
+        2,
+        2,
+      ],
+      uniform: [
+        'resolution',
+        'crevice',
+        'mouse',
+        'resourceAspect',
         'inputTexture',
         'dropScale',
         'dropAttenuation',
@@ -698,8 +743,6 @@ export class Renderer {
         'uniform2fv',
         'uniform2fv',
         'uniform1f',
-        'uniform1f',
-        'uniform1f',
         'uniform1i',
         'uniform1f',
         'uniform1f',
@@ -727,8 +770,6 @@ export class Renderer {
       ],
     };
     this.shaderProgram = new ShaderProgram(gl, option);
-    option.vertexShaderSource = this.exVertexShaderSource;
-    this.exShaderProgram = new ShaderProgram(gl, option);
 
     this.uniformStore = [
       new UniformStore(),
@@ -736,6 +777,8 @@ export class Renderer {
     ];
     this.uniformStoreIndex = 1;
     this.updateParameter(this.uniformStore[this.uniformStoreIndex].get());
+
+    this.framebuffers = [];
 
     this.uCrevice = [0, 0];
     this.uMouse = [0.0, 0.0];
@@ -751,13 +794,23 @@ export class Renderer {
     if (this.gl == null || this.image == null) {return;}
     const gl = this.gl;
 
+    if (this.framebuffers.length > 0) {
+      this.framebuffers.forEach((buffer) => {
+        WebGLUtility.deleteFrameBuffer(gl, buffer);
+      });
+      this.framebuffers = null;
+    }
+    this.framebuffers = [
+      WebGLUtility.createFramebuffer(gl, this.imageWidth, this.imageHeight),
+      WebGLUtility.createFramebuffer(gl, this.imageWidth, this.imageHeight),
+    ];
+
     if (this.texture != null) {
       gl.bindTexture(gl.TEXTURE_2D, null);
       gl.deleteTexture(this.texture);
       this.texture = null;
     }
     this.texture = WebGLUtility.createTexture(gl, this.image);
-    gl.bindTexture(gl.TEXTURE_2D, this.texture);
 
     if (this.isRendering !== true) {
       this.isRendering = true;
@@ -766,10 +819,40 @@ export class Renderer {
   }
   render(): void {
     const gl = this.gl;
+    if (this.framebuffers.length === 0) {return;}
 
     requestAnimationFrame(this.render);
 
+    // render to framebuffer
+    gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(gl.TEXTURE_2D, this.texture);
+    this.shaderProgram.use();
+    this.shaderProgram.setAttribute(this.vbo, this.ibo);
+    this.framebuffers.forEach((buffer, index) => {
+      gl.bindFramebuffer(gl.FRAMEBUFFER, buffer.framebuffer);
+      gl.viewport(0, 0, this.imageWidth, this.imageHeight);
+      gl.clear(gl.COLOR_BUFFER_BIT);
+      this.renderByUniformStore(this.shaderProgram, this.uniformStore[index]);
+    });
+
+    // finish
+    gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(gl.TEXTURE_2D, this.framebuffers[0].texture);
+    gl.activeTexture(gl.TEXTURE1);
+    gl.bindTexture(gl.TEXTURE_2D, this.framebuffers[1].texture);
+    const uniforms = [
+      this.uCrevice,
+      this.uMouse,
+      this.uCanvasAspect,
+      this.uResourceAspect,
+      this.uVertexScale,
+      0,
+      1,
+    ];
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+
     if (this.exportFunction != null) {
+      // fit a canvas size
       const iw = 1.0 / (1.0 - this.uCrevice[0]);
       const ih = 1.0 / (1.0 - this.uCrevice[1]);
       const width = this.imageWidth * iw;
@@ -777,27 +860,27 @@ export class Renderer {
       this.glCanvas.width = width;
       this.glCanvas.height = height;
       this.uCanvasAspect = width / height;
-    }
-
-    gl.viewport(0, 0, this.glCanvas.width, this.glCanvas.height);
-    gl.clear(gl.COLOR_BUFFER_BIT);
-
-    if (this.exportFunction != null) {
+      // render
+      gl.viewport(0, 0, this.glCanvas.width, this.glCanvas.height);
+      gl.clear(gl.COLOR_BUFFER_BIT);
       this.exShaderProgram.use();
-      this.exShaderProgram.setAttribute(this.vbo, this.ibo);
-      this.renderByUniformStore(this.exShaderProgram, this.uniformStore[0]);
-      this.renderByUniformStore(this.exShaderProgram, this.uniformStore[1]);
-
+      this.exShaderProgram.setAttribute(this.finishVbo, this.ibo);
+      this.exShaderProgram.setUniform(uniforms);
+      gl.drawElements(gl.TRIANGLES, this.indices.length, gl.UNSIGNED_SHORT, 0);
+      // reset
       this.exportFunction();
       this.exportFunction = null;
       this.glCanvas.width = window.innerWidth;
       this.glCanvas.height = window.innerHeight;
       this.uCanvasAspect = window.innerWidth / window.innerHeight;
     } else {
-      this.shaderProgram.use();
-      this.shaderProgram.setAttribute(this.vbo, this.ibo);
-      this.renderByUniformStore(this.shaderProgram, this.uniformStore[0]);
-      this.renderByUniformStore(this.shaderProgram, this.uniformStore[1]);
+      // render
+      gl.viewport(0, 0, this.glCanvas.width, this.glCanvas.height);
+      gl.clear(gl.COLOR_BUFFER_BIT);
+      this.finishShaderProgram.use();
+      this.finishShaderProgram.setAttribute(this.finishVbo, this.ibo);
+      this.finishShaderProgram.setUniform(uniforms);
+      gl.drawElements(gl.TRIANGLES, this.indices.length, gl.UNSIGNED_SHORT, 0);
     }
   }
   renderByUniformStore(program: ShaderProgram, uniform: UniformStore): void {
@@ -807,9 +890,7 @@ export class Renderer {
       [this.imageWidth, this.imageHeight],
       this.uCrevice,
       this.uMouse,
-      this.uCanvasAspect,
       this.uResourceAspect,
-      this.uVertexScale,
       0,
       this.uDropScale,
       this.uDropAttenuation,
