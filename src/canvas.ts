@@ -694,8 +694,33 @@ export class Renderer {
       ],
     };
     this.finishShaderProgram = new ShaderProgram(gl, finishOption);
-    finishOption.vertexShaderSource = this.exVertexShaderSource;
-    this.exShaderProgram = new ShaderProgram(gl, finishOption);
+    const exOption = {
+      vertexShaderSource: this.exVertexShaderSource,
+      fragmentShaderSource: this.finishFragmentShaderSource,
+      attribute: [
+        'position',
+        'texCoord',
+        'offset',
+      ],
+      stride: [
+        2,
+        2,
+        2,
+      ],
+      uniform: [
+        'crevice',
+        'mouse',
+        'firstTexture',
+        'secondTexture',
+      ],
+      type: [
+        'uniform2fv',
+        'uniform2fv',
+        'uniform1i',
+        'uniform1i',
+      ],
+    };
+    this.exShaderProgram = new ShaderProgram(gl, exOption);
 
     const option = {
       vertexShaderSource: this.vertexShaderSource,
@@ -710,7 +735,6 @@ export class Renderer {
       ],
       uniform: [
         'resolution',
-        'crevice',
         'mouse',
         'resourceAspect',
         'inputTexture',
@@ -739,7 +763,6 @@ export class Renderer {
         'sNoiseTime',
       ],
       type: [
-        'uniform2fv',
         'uniform2fv',
         'uniform2fv',
         'uniform1f',
@@ -840,15 +863,6 @@ export class Renderer {
     gl.bindTexture(gl.TEXTURE_2D, this.framebuffers[0].texture);
     gl.activeTexture(gl.TEXTURE1);
     gl.bindTexture(gl.TEXTURE_2D, this.framebuffers[1].texture);
-    const uniforms = [
-      this.uCrevice,
-      this.uMouse,
-      this.uCanvasAspect,
-      this.uResourceAspect,
-      this.uVertexScale,
-      0,
-      1,
-    ];
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 
     if (this.exportFunction != null) {
@@ -861,6 +875,12 @@ export class Renderer {
       this.glCanvas.height = height;
       this.uCanvasAspect = width / height;
       // render
+      const uniforms = [
+        this.uCrevice,
+        this.uMouse,
+        0,
+        1,
+      ];
       gl.viewport(0, 0, this.glCanvas.width, this.glCanvas.height);
       gl.clear(gl.COLOR_BUFFER_BIT);
       this.exShaderProgram.use();
@@ -875,6 +895,15 @@ export class Renderer {
       this.uCanvasAspect = window.innerWidth / window.innerHeight;
     } else {
       // render
+      const uniforms = [
+        this.uCrevice,
+        this.uMouse,
+        this.uCanvasAspect,
+        this.uResourceAspect,
+        this.uVertexScale,
+        0,
+        1,
+      ];
       gl.viewport(0, 0, this.glCanvas.width, this.glCanvas.height);
       gl.clear(gl.COLOR_BUFFER_BIT);
       this.finishShaderProgram.use();
@@ -888,7 +917,6 @@ export class Renderer {
     this.updateParameter(uniform.get());
     const uniforms = [
       [this.imageWidth, this.imageHeight],
-      this.uCrevice,
       this.uMouse,
       this.uResourceAspect,
       0,

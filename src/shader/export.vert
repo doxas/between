@@ -3,8 +3,6 @@ attribute vec2 texCoord;
 attribute vec2 offset;
 uniform vec2 crevice;
 uniform vec2 mouse;
-uniform float canvasAspect;
-uniform float resourceAspect;
 varying vec2 vTexCoord;
 void main() {
   vec2 edge = (1.0 - abs(position));
