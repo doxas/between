@@ -46,10 +46,6 @@ export class Renderer {
   private uCanvasAspect: number;
   private uResourceAspect: number;
   private uVertexScale: number;
-  private uDropScale: number;
-  private uDropAttenuation: number;
-  private uDropRange: number;
-  private uDropDistortion: number;
   private uTemperature: number;
   private uTint: number;
   private uContrast: number;
@@ -130,22 +126,6 @@ export class Renderer {
       min: 0,
       max: 0.5,
     }).on('change', (v) => { this.uCrevice[1] = v.value; });
-    const dropScale = generalFolder.addBinding({'drop-scl': this.uDropScale}, 'drop-scl', {
-      min: 0.0,
-      max: 2.0,
-    }).on('change', (v) => { this.uDropScale = v.value; });
-    const dropAttenuation = generalFolder.addBinding({'drop-att': this.uDropAttenuation}, 'drop-att', {
-      min: 1.0,
-      max: 10.0,
-    }).on('change', (v) => { this.uDropAttenuation = v.value; });
-    const dropRange = generalFolder.addBinding({'drop-rng': this.uDropRange}, 'drop-rng', {
-      min: 0.0,
-      max: 0.99,
-    }).on('change', (v) => { this.uDropRange = v.value; });
-    const dropDistortion = generalFolder.addBinding({'drop-dst': this.uDropDistortion}, 'drop-dst', {
-      min: 1.0,
-      max: 10.0,
-    }).on('change', (v) => { this.uDropDistortion = v.value; });
     const vertexScale = generalFolder.addBinding({'scale': this.uVertexScale}, 'scale', {
       min: 1.0,
       max: 5.0,
@@ -735,13 +715,8 @@ export class Renderer {
       ],
       uniform: [
         'resolution',
-        'mouse',
         'resourceAspect',
         'inputTexture',
-        'dropScale',
-        'dropAttenuation',
-        'dropRange',
-        'dropDistortion',
         'hsv',
         'sobel',
         'temperature',
@@ -764,13 +739,8 @@ export class Renderer {
       ],
       type: [
         'uniform2fv',
-        'uniform2fv',
         'uniform1f',
         'uniform1i',
-        'uniform1f',
-        'uniform1f',
-        'uniform1f',
-        'uniform1f',
         'uniform3fv',
         'uniform1f',
         'uniform1f',
@@ -805,10 +775,6 @@ export class Renderer {
 
     this.uCrevice = [0, 0];
     this.uMouse = [0.0, 0.0];
-    this.uDropScale = 0.0;
-    this.uDropAttenuation = 5.0;
-    this.uDropRange = 0.5;
-    this.uDropDistortion = 1.0;
     this.uVertexScale = 1.25;
 
     gl.clearColor(0.5, 0.5, 0.5, 1.0);
@@ -917,13 +883,8 @@ export class Renderer {
     this.updateParameter(uniform.get());
     const uniforms = [
       [this.imageWidth, this.imageHeight],
-      this.uMouse,
       this.uResourceAspect,
       0,
-      this.uDropScale,
-      this.uDropAttenuation,
-      this.uDropRange,
-      this.uDropDistortion,
       this.isHSV ? this.uHSV : [0.0, 0.0, 0.0],
       this.isSobel ? this.uSobel : 0.0,
       this.isTemperature ? this.uTemperature : 0.0,

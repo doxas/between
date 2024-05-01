@@ -1,12 +1,7 @@
 precision highp float;
-uniform vec2 mouse;
 uniform vec2 resolution;
 uniform float resourceAspect;
 uniform sampler2D inputTexture;
-uniform float dropScale; // 0.1 ~
-uniform float dropAttenuation; // 1.0 ~
-uniform float dropRange; // 0.0 ~ 1.0
-uniform float dropDistortion; // 1.0 ~
 uniform vec3 hsv;
 uniform float sobel; // -2.0 ~ 2.0
 uniform float temperature; // -1.67 ~ 1.67
@@ -456,21 +451,6 @@ void main() {
   if (mosaic > 0.0) {
     texCoord = floor(aspected * mosaic + 0.5) / mosaic;
     texCoord = (texCoord / aspectCoord) * 0.5 + 0.5;
-  }
-
-  // drop
-  if (dropScale > 0.0) {
-    vec2 asp = (texCoord * 2.0 - 1.0) * aspectCoord;
-    vec2 aspectedMouse = vec2(mouse.x * resourceAspect, -mouse.y);
-    vec2 distanceToMouse = asp - aspectedMouse;
-    float clampedMouse = min(1.0, length(distanceToMouse) * dropScale);
-    if (clampedMouse < 1.0) {
-      float dropDiff = max(0.0, clampedMouse - dropRange);
-      dropDiff = pow(dropDiff / (1.0 - dropRange), dropAttenuation);
-      distanceToMouse *= 1.0 + dropDiff * dropDistortion;
-      distanceToMouse += aspectedMouse;
-      texCoord = (distanceToMouse / aspectCoord) * 0.5 + 0.5;
-    }
   }
 
   // rgb-shift and sobel
