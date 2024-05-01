@@ -27,6 +27,10 @@ void main() {
     outColor = min(firstColor, secondColor);
   } else if (blend == 7) {
     outColor = max(firstColor, secondColor);
+  } else if (blend == 8) {
+    outColor = abs(firstColor - secondColor);
+  } else if (blend == 9) {
+    outColor = (firstColor + secondColor) - 2.0 * firstColor * secondColor;
   }
 
   // final output

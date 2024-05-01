@@ -91,6 +91,8 @@ export class Renderer {
     SCREEN: 5,
     DARKEN: 6,
     LIGHTEN: 7,
+    DIFFERENCE: 8,
+    EXCLUSION: 9,
   };
 
   constructor(parent: HTMLElement) {
