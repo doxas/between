@@ -905,7 +905,7 @@ export class Renderer {
       this.uToonMin,
       this.uToonMax,
       this.isShift ? [this.uShift[0] * this.shiftScale, this.uShift[1] * this.shiftScale] : [0.0, 0.0],
-      this.uVignette,
+      this.isVignette ? this.uVignette : 1.0,
       this.isVignette ? this.uVignetteScale : 0.0,
       this.isNoise ? this.uNoiseIntensity : [0.0, 0.0],
       this.isNoise ? this.uNoiseScale : [1.0, 1.0],
