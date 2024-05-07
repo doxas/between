@@ -335,6 +335,24 @@ export class Renderer {
       max: 10.0,
     }).on('change', (v) => { setter('uSNoiseTime', v.value); });
     const toolFolder = pane.addFolder({title: 'tool'});
+    const fromFirstButton = toolFolder.addButton({
+      title: 'first to second',
+    });
+    fromFirstButton.on('click', () => {
+      const source = this.uniformStore[0];
+      this.uniformStore[1].copy(source);
+      this.updateParameter(this.uniformStore[this.uniformStoreIndex].get());
+      this.updatePane();
+    });
+    const fromSecondButton = toolFolder.addButton({
+      title: 'second to first',
+    });
+    fromSecondButton.on('click', () => {
+      const source = this.uniformStore[1];
+      this.uniformStore[0].copy(source);
+      this.updateParameter(this.uniformStore[this.uniformStoreIndex].get());
+      this.updatePane();
+    });
     const openButton = toolFolder.addButton({
       title: 'open',
     });

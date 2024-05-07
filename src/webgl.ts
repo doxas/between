@@ -458,5 +458,13 @@ export class UniformStore {
       return this.data[key];
     }
   }
+  copy(source: UniformStore): void {
+    Object.entries(this.data).forEach(([key, value]) => {
+      const v = source.get(key);
+      if (v != null) {
+        this.set(key, v);
+      }
+    });
+  }
 }
 
