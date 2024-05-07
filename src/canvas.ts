@@ -430,116 +430,99 @@ export class Renderer {
         store.set(k, v);
       });
     });
+    // randomize parameters by index for uniform store
+    const shuffle =(index: number) => {
+      const store = this.uniformStore[index];
+      this.updateParameter(store.get());
+      // randomize values
+      if (store.get('isTemperature') === true) {
+        const uTemperature = Math.random() * (1.67 * 2.0) - 1.67;
+        store.set('uTemperature', uTemperature);
+      }
+      if (store.get('isTint') === true) {
+        const uTint = Math.random() * (1.67 * 2.0) - 1.67;
+        store.set('uTint', uTint);
+      }
+      if (store.get('isContrast') === true) {
+        const uContrast = Math.random() * 2.0;
+        store.set('uContrast', uContrast);
+      }
+      if (store.get('isHSV') === true) {
+        const uHSV0 = Math.random();
+        const uHSV1 = Math.random() * 2.0 - 1.0;
+        const uHSV2 = Math.random() * 2.0 - 1.0;
+        store.set('uHSV', [uHSV0, uHSV1, uHSV2]);
+      }
+      if (store.get('isSobel') === true) {
+        const uSobel = Math.random() * 4.0 - 2.0;
+        store.set('uSobel', uSobel);
+      }
+      if (store.get('isBayer') === true) {
+        const uBayer = Math.random() * 399.0 + 1.0;
+        store.set('uBayer', uBayer);
+      }
+      if (store.get('isToon') === true) {
+        const uToon = Math.floor(Math.random() * 9.0) + 2.0;
+        const uToonMin = Math.random() * 0.5;
+        const uToonMax = Math.random() * 0.5 + 0.5;
+        store.set('uToon', uToon);
+        store.set('uToonMin', uToonMin);
+        store.set('uToonMax', uToonMax);
+      }
+      if (store.get('isMosaic') === true) {
+        // dare to make different
+        const uMosaic = Math.random() * 199.0 + 1.0;
+        store.set('uMosaic', uMosaic);
+      }
+      if (store.get('isShift') === true) {
+        // dare to make different
+        const uShiftScale = Math.random() * 0.2;
+        const uShift = [Math.random() * 2.0 - 1.0, Math.random() * 2.0 - 1.0];
+        store.set('shiftScale', uShiftScale);
+        store.set('uShift', uShift);
+      }
+      if (store.get('isVignette') === true) {
+        const uVignette = Math.random() * 4.0;
+        const uVignetteScale = Math.random() * 4.0;
+        store.set('uVignette', uVignette);
+        store.set('uVignetteScale', uVignetteScale);
+      }
+      if (store.get('isNoise') === true) {
+        const uNoiseIntensity = [Math.random() * 20.0 - 10.0, Math.random() * 20.0 - 10.0];
+        const uNoiseScale = [Math.random() * 499.0 + 1.0, Math.random() * 499.0 + 1.0];
+        // dare to make different
+        const uNoiseTime = Math.random() * 0.1;
+        store.set('uNoiseIntensity', uNoiseIntensity);
+        store.set('uNoiseScale', uNoiseScale);
+        store.set('uNoiseTime', uNoiseTime);
+      }
+      if (store.get('isSNoise') === true) {
+        // dare to make different
+        const uSNoiseIntensity = [Math.random() * 0.2 - 0.1, Math.random() * 0.2 - 0.1];
+        // dare to make different
+        const uSNoiseScale = [Math.random() * 5.0, Math.random() * 5.0];
+        const uSNoiseTime = Math.random() * 10.0;
+        store.set('uSNoiseIntensity', uSNoiseIntensity);
+        store.set('uSNoiseScale', uSNoiseScale);
+        store.set('uSNoiseTime', uSNoiseTime);
+      }
+    };
     const randomButton = toolFolder.addButton({
       title: 'randomize',
     });
     randomButton.on('click', () => {
-      // randomize values
-      if (this.isTemperature === true) {
-        this.uTemperature = Math.random() * (1.67 * 2.0) - 1.67;
-      }
-      if (this.isTint === true) {
-        this.uTint = Math.random() * (1.67 * 2.0) - 1.67;
-      }
-      if (this.isContrast === true) {
-        this.uContrast = Math.random() * 2.0;
-      }
-      if (this.isHSV === true) {
-        this.uHSV[0] = Math.random();
-        this.uHSV[1] = Math.random() * 2.0 - 1.0;
-        this.uHSV[2] = Math.random() * 2.0 - 1.0;
-      }
-      if (this.isSobel === true) {
-        this.uSobel = Math.random() * 4.0 - 2.0;
-      }
-      if (this.isBayer === true) {
-        this.uBayer = Math.random() * 399.0 + 1.0;
-      }
-      if (this.isToon === true) {
-        this.uToon = Math.floor(Math.random() * 9.0) + 2.0;
-        this.uToonMin = Math.random() * 0.5;
-        this.uToonMax = Math.random() * 0.5 + 0.5;
-      }
-      if (this.isMosaic === true) {
-        // dare to make different
-        this.uMosaic = Math.random() * 199.0 + 1.0;
-      }
-      if (this.isShift === true) {
-        // dare to make different
-        this.shiftScale = Math.random() * 0.2;
-        this.uShift = [Math.random() * 2.0 - 1.0, Math.random() * 2.0 - 1.0];
-      }
-      if (this.isVignette === true) {
-        this.uVignette = Math.random() * 4.0;
-        this.uVignetteScale = Math.random() * 4.0;
-      }
-      if (this.isNoise === true) {
-        this.uNoiseIntensity = [Math.random() * 20.0 - 10.0, Math.random() * 20.0 - 10.0];
-        this.uNoiseScale = [Math.random() * 499.0 + 1.0, Math.random() * 499.0 + 1.0];
-        // dare to make different
-        this.uNoiseTime = Math.random() * 0.1;
-      }
-      if (this.isSNoise === true) {
-        // dare to make different
-        this.uSNoiseIntensity = [Math.random() * 0.2 - 0.1, Math.random() * 0.2 - 0.1];
-        // dare to make different
-        this.uSNoiseScale = [Math.random() * 5.0, Math.random() * 5.0];
-        this.uSNoiseTime = Math.random() * 10.0;
-      }
-      // set to inputs
-      temperature.controller.value.setRawValue(this.uTemperature);
-      tint.controller.value.setRawValue(this.uTint);
-      contrast.controller.value.setRawValue(this.uContrast);
-      HSVH.controller.value.setRawValue(this.uHSV[0]);
-      HSVS.controller.value.setRawValue(this.uHSV[1]);
-      HSVV.controller.value.setRawValue(this.uHSV[2]);
-      sobel.controller.value.setRawValue(this.uSobel);
-      mosaic.controller.value.setRawValue(this.uMosaic);
-      bayer.controller.value.setRawValue(this.uBayer);
-      toon.controller.value.setRawValue(this.uToon);
-      toonMin.controller.value.setRawValue(this.uToonMin);
-      toonMax.controller.value.setRawValue(this.uToonMax);
-      shiftScale.controller.value.setRawValue(this.shiftScale);
-      shiftX.controller.value.setRawValue(this.uShift[0]);
-      shiftY.controller.value.setRawValue(this.uShift[1]);
-      vignette.controller.value.setRawValue(this.uVignette);
-      vignetteScale.controller.value.setRawValue(this.uVignetteScale);
-      noiseIntensityX.controller.value.setRawValue(this.uNoiseIntensity[0]);
-      noiseIntensityY.controller.value.setRawValue(this.uNoiseIntensity[1]);
-      noiseScaleX.controller.value.setRawValue(this.uNoiseScale[0]);
-      noiseScaleY.controller.value.setRawValue(this.uNoiseScale[1]);
-      noiseTime.controller.value.setRawValue(this.uNoiseTime);
-      sNoiseIntensityX.controller.value.setRawValue(this.uSNoiseIntensity[0]);
-      sNoiseIntensityY.controller.value.setRawValue(this.uSNoiseIntensity[1]);
-      sNoiseScaleX.controller.value.setRawValue(this.uSNoiseScale[0]);
-      sNoiseScaleY.controller.value.setRawValue(this.uSNoiseScale[1]);
-      sNoiseTime.controller.value.setRawValue(this.uSNoiseTime);
-      // update uniform store
-      const store = this.uniformStore[this.uniformStoreIndex];
-      Object.entries({
-        uTemperature: this.uTemperature,
-        uTint: this.uTint,
-        uContrast: this.uContrast,
-        uHSV: this.uHSV,
-        uSobel: this.uSobel,
-        uMosaic: this.uMosaic,
-        uBayer: this.uBayer,
-        uToon: this.uToon,
-        uToonMin: this.uToonMin,
-        uToonMax: this.uToonMax,
-        shiftScale: this.shiftScale,
-        uShift: this.uShift,
-        uVignette: this.uVignette,
-        uVignetteScale: this.uVignetteScale,
-        uNoiseIntensity: this.uNoiseIntensity,
-        uNoiseScale: this.uNoiseScale,
-        uNoiseTime: this.uNoiseTime,
-        uSNoiseIntensity: this.uSNoiseIntensity,
-        uSNoiseScale: this.uSNoiseScale,
-        uSNoiseTime: this.uSNoiseTime,
-      }).forEach(([k, v]) => {
-        store.set(k, v);
-      });
+      shuffle(this.uniformStoreIndex);
+      this.updateParameter(this.uniformStore[this.uniformStoreIndex].get());
+      this.updatePane();
+    });
+    const shuffleButton = toolFolder.addButton({
+      title: 'shuffle all',
+    });
+    shuffleButton.on('click', () => {
+      shuffle(this.uniformStoreIndex);
+      shuffle(1 - this.uniformStoreIndex);
+      this.updateParameter(this.uniformStore[this.uniformStoreIndex].get());
+      this.updatePane();
     });
 
     const info = `drag and drop image.
